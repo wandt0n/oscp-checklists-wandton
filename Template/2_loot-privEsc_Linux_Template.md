@@ -35,6 +35,16 @@ cat /etc/*-release; uname -a
 find / -perm -u=s -type f 2>/dev/null
 ```
 	
+##### Network interfaces
+```bash
+ip a
+```
+	
+##### Gateways
+```bash
+/sbin/route
+```
+	
 ##### Running processes
 ```bash
 ps aux
@@ -88,19 +98,9 @@ Is there e.g. a browser we can grab cookies/passwords from?
 pasco index.dat
 ```
 	
-##### Network interfaces
-```bash
-ip a
-```
-	
 ##### Firewall settings
 ```bash
 sudo iptables -S
-```
-	
-##### Gateways
-```bash
-/sbin/route
 ```
 	
 ##### Listeners/Connections
@@ -127,7 +127,8 @@ lsmod
 /sbin/modinfo [module]
 ```
 	
-
+If Wordpress:
+	Look at `wp-config.php`. It contains hardcoded MySQL credentials
 
 
 # Findings
