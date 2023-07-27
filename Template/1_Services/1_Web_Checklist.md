@@ -13,7 +13,7 @@
 ```
 whatweb -v -a 3 $hip:80 > technologies.txt
 ```
-
+Ausprobieren: https://github.com/projectdiscovery/httpx
 
 ## Nikto
 ```
@@ -32,6 +32,15 @@ dirb http://$hip:80 > dirb.txt
 ```
 gobuster dir -u http://$hip -w /usr/share/wordlists/dirb/common.txt -o gobuster.txt -x txt,pdf,config 
 ```
+
+
+##### Files of possible relevance
+`/robots.txt` , `/crossdomain.xml` `/clientaccesspolicy.xml` `/sitemap.xml` and `/.well-known/`
+
+Ausprobieren:
+Check potential vulnerable urls with https://github.com/1ndianl33t/Gf-Patterns
+https://github.com/stevenvachon/broken-link-checker
+https://github.com/projectdiscovery/nuclei-templates/tree/4e3f843e15c68f816f0ef6abce5d30b6cf6d4a30/exposures/tokens
 
 
 ## WPSCAN
