@@ -45,6 +45,11 @@ ip a
 /sbin/route
 ```
 	
+##### Logged-In Users
+```bash
+w
+```
+	
 ##### Running processes
 ```bash
 ps aux
@@ -108,17 +113,17 @@ sudo iptables -S
 netstat -anp
 ```
 	
-Git
+##### Git
 ```bash
 find / -name ".git" 2>/dev/null (cd to the directories and do "git config --list" )
 ```
 	
-Mounted Volumes
+##### Mounted Volumes
 ```bash
 cat /etc/fstab; mount; /bin/lsblk
 ```
 	
-Drivers
+##### Drivers
 ```bash
 lsmod
 ```
@@ -127,7 +132,7 @@ lsmod
 /sbin/modinfo [module]
 ```
 	
-If Wordpress:
+##### If Wordpress:
 	Look at `wp-config.php`. It contains hardcoded MySQL credentials
 
 
