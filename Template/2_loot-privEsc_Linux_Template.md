@@ -57,7 +57,7 @@ dpkg -l
 	
 ##### Scheduled tasks
 ```bash
-ls -lah /etc/cron* ; cat /etc/crontab
+ls -lah /etc/cron* ; cat /etc/crontab; grep "CRON" /var/log/syslog
 ```
 Are any of those or the scripts within writeable?
 	
