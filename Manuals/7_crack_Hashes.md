@@ -18,3 +18,10 @@ hashcat -a 3 -m 900 --encoding-to utf16le NTHashes.txt
 ```
 unshadow passwd shadow > unshadowed.txt
 ```
+
+```
+john $file --wordlist=/usr/share/wordlists/rockyou.txt
+```
+
+# For unsalted hashes
+https://crackstation.net/
