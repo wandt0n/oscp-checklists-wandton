@@ -1,5 +1,11 @@
 <% tp.file.rename("3_privEsc_Windows")%>
-> Completely done with the looting checklist? Then you can try this:
+
+> **Completely done with the looting checklist?** [[2_loot_Windows_Template]] Then you can try this:
+
+
+https://github.com/PowerShellMafia/PowerSploit/blob/master/Privesc/PowerUp.ps1
+	include the file `. .\PowerUp.ps1`  and then e.g. `Get-ModifiableServiceFile`
+
 
 ##### Registry misconfigurations
 Can .msi's run privileged without UAC?
@@ -17,6 +23,8 @@ reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallEle
 reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
 ```
 	
+
+##### [[3_DLL_Hijacking]]
 
 ##### LOLBAS
 https://lolbas-project.github.io/#
