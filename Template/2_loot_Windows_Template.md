@@ -2,27 +2,26 @@
 Hostname `hostname`
 	
 
-## PrivEsc Relevant (winPEAS und adPEAS script?)
+## PrivEsc Relevant
+
+#### winPEAS Script
+	
 
 ##### Users
 ```powershell
 Get-LocalUser
 ```
-(Alternative: `net user`)
+Alternative: `net user`
 ```powershell
 Get-LocalGroup
 ```
-(Alternative: `net localgroup`)
-(Of interest: Non-standard groups, _Administrators_, _Backup Operators_ (Universal file access), _Remote Desktop Users_ (RDP), and _Remote Management Users_ (WinRM))
+Alternative: `net localgroup`
+Of interest: Non-standard groups, _Administrators_, _Backup Operators_ (Universal file access), _Remote Desktop Users_ (RDP), and _Remote Management Users_ (WinRM)
 ```powershell
 Get-LocalGroupMember administrators
 ```
-Alternative: `net localgroup administrators`
-```powershell
-net user /domain
-```
 	
-
+Alternative: `net localgroup administrators`
 ##### Privileges:
 ```powershell
 whoami /all
@@ -31,9 +30,9 @@ whoami /all
 ```powershell
 reg query "HKU\S-1-5-19"
 ```
+	
 (_SeImpersonatePrivilege_ or _SeAssignPrimaryToken_ -> Named Pipes [PrintSpoofer](https://github.com/itm4n/PrintSpoofer) or Juicy/Rotten/Sweet Potato)
 (Also of interest: _SeBackupPrivilege_, _SeLoadDriver_, and _SeDebug_)
-	
 Example for administrative, non-vulnerable account:
 	```
 	Group Name                                                    Type             SID          Attributes
@@ -77,8 +76,8 @@ vault::cred /patch
 ```powershell
 systeminfo | findstr /B /C:"OS Name" /C:"OS Version" /C:"System Type"
 ```
-(See: https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions)
 	
+(See: https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions)
 ##### Interesting user files
 ```powershell
 Get-ChildItem -Path C:\ -Include *.kdbx -Include *password* -Include proof.txt -Include local.txt -File -Recurse -ErrorAction SilentlyContinue
@@ -87,7 +86,7 @@ Get-ChildItem -Path C:\ -Include *.kdbx -Include *password* -Include proof.txt -
 ```powershell
 Get-ChildItem -Path C:\Users\ -Include *.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx -File -Recurse -ErrorAction SilentlyContinue
 ```
-
+	
 ##### Running processes
 ```powershell
 tasklist /SVC
@@ -134,7 +133,7 @@ Standard processes:
 wmic product get name"," version"," vendor
 ```
 	
- (Alternative: `Get-ItemProperty "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | select displayname` (32-bit) and `Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | select displayname`. Also, check the _Program Files_ directories as this list might be incomplete)
+ Alternative: `Get-ItemProperty "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | select displayname` (32-bit) and `Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | select displayname`. Also, check the _Program Files_ directories as this list might be incomplete
 ##### Services
 ```powershell
 wmic service get name","displayname","pathname","startmode |findstr /i "auto" |findstr /i /v "c:\windows\\"
@@ -147,14 +146,14 @@ Check if non-default services have files with lax write-permissions (W or F):
 ```powershell
 icacls $file
 ```
+	
 (Alternative: `Get-ACL`)
 Also check if any of the pathnames are unquoted but contain spaces. e.g. with: `wmic service get name,pathname |  findstr /i /v "C:\Windows\\" | findstr /i /v """`
-	
 ##### Scheduled tasks
 ```powershell
 schtasks /query /fo LIST /v
 ```
-(Alternative: `Get-ScheduledTask`)
+Alternative: `Get-ScheduledTask`
 ```powershell
 schtasks /query /fo CSV /v | ConvertFrom-Csv | where { $_.Status -ne "Disabled" } | where { $_.Author -notlike "*Microsoft*" } | where { $_.Author -notlike "*N/A*" } | where { $_.Author -ne "Author" }
 ```
