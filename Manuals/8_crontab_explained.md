@@ -9,5 +9,4 @@
  └──────────── minute (0-59)
 
 ```
-testscript.sh wird in jedem Monat $(*)$ alle 3 Tage $(*/3)$
-immer um 07:05 und 07:35 ausgeführt.
+testscript.sh will be executed every month $(*)$ once every 3 days $(*/3)$ at 07:05 and 07:35 

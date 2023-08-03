@@ -41,12 +41,12 @@ for ip in $(seq 1 255);do host $subnet$ip $dns_server | grep "arpa" | grep -v "n
 ---
 # Create working dirs and start individual system scanning
 
-```
+```bash
 for i in $(cat 0_Hosts.txt); do (mkdir $i && cd $_ && sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -T 5 -sUV --top-ports 100 $i -oN 0_udp_top100.txt)& done
 ```
 
 For single host:
-```
+```bash
 i="";sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -T 5 -sUV --top-ports 100 $i -oN 0_udp_top100.txt
 ```
 

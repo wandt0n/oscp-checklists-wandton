@@ -14,10 +14,10 @@ Search order in the safe DLL search mode, activated by default:
 4. Run binary
 5. Look for `CreateFile` calls in the `Operation` column
 6. If the `Details` column says `Name not found`, look whether one of those directories is writeable for us on the actual target. In that case, we can just create a DLL in this path. Otherwise, we could look whether we have write permissions on some of the successfully called DLLs.
-7. Restart the service. If we don't have the permission but we can restart the host (`whoami /priv`) and the service has the `StartMode` set to `Auto` (see [[2_loot_Windows_Template]]), we could restart the whole machine (`reboot /r /t 0`).
+7. Restart the service. If we don't have the permission but we can restart the host (`whoami /priv`) and the service has the `StartMode` set to `Auto` (see [[2_loot-privEsc_Windows_Manually]]), we could restart the whole machine (`reboot /r /t 0`).
 
 #### Example payload
-Compile with the `--shared` flag, as shown in [[8_windowsCrosscompile]].
+Compile with the `--shared` flag, as shown in [[8_crosscompile2windows_guide]].
 ```c++
 #include <stdlib.h>
 #include <windows.h>
