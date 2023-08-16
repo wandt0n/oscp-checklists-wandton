@@ -23,6 +23,11 @@ unshadow passwd shadow > unshadowed.txt
 john $file --wordlist=/usr/share/wordlists/rockyou.txt
 ```
 
+## Encrypted SSH Key
+```bash
+ssh2john $file > id_rsa.hash
+```
+With this, you can pass id_rsa.hash to john as regular. 
 # For unsalted hashes
 https://crackstation.net/
 

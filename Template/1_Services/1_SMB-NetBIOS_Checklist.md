@@ -7,6 +7,10 @@ crackmapexec smb $hip
 Alternativ: [grab_smbversion.sh](file:////home/kali/Documents/activeInformationGathering/)
 	
 
+## Enum4Linux
+```bash
+enum4linux -a $hip
+```
 ## Enum shares as user
 ```bash
 crackmapexec smb $hip -u $user -p "$password" --shares
@@ -14,6 +18,30 @@ crackmapexec smb $hip -u $user -p "$password" --shares
 (`$users` can be `$(cat ../0_Users_Hashes.md | cut -d ":" -f 1)`)
 Alternativ: `net view \\dc01 /all`
 	
+## NSE
+```bash
+nmap --script "safe and smb-enum-*" -p 445 $hip
+```
+
+## Connect RPC
+```bash
+rpcclient -U "username%passwd" $hip
+```
+Without creds: `-U "" -N`
+
+## List files in SMB share
+```bash
+smbclient --no-pass -c 'recurse;ls' //$hip/$folder
+```
+
+## Download all files from smb share
+``` bash
+smbclient //<IP>/<share>
+> mask ""
+> recurse
+> prompt
+> mget *
+```
 
 ## Check for valid domain credentials
 ```bash

