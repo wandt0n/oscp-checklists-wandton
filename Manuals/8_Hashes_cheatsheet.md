@@ -8,6 +8,11 @@ hashid $hash
 ```
 
 
+# Find credentials in source
+```bash
+~/Documents/activeInformationGathering/trufflehog filesystem --no-verification $path
+```
+
 # Hashcat
 NT Hash
 ```powershell
@@ -20,7 +25,7 @@ unshadow passwd shadow > unshadowed.txt
 ```
 
 ```
-john $file --wordlist=/usr/share/wordlists/rockyou.txt
+john --wordlist=/usr/share/wordlists/rockyou.txt $file
 ```
 
 ## Encrypted SSH Key

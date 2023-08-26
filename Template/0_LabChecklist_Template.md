@@ -3,6 +3,8 @@
 
 1. Create Subfolder in "lab"
 
+> **Update Searchsploit** with `searchsploit -u`
+
 # Find Hosts in Subnet
 
 Change SUBNET in the following line (keep the point)

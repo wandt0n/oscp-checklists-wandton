@@ -2,7 +2,7 @@
 
 ## Start scans
 ```bash
-target=""; nikto -maxtime=60s -host=https://$target/ > nikto.txt & dirb http://$target -S > dirb.txt & whatweb -v -a 3 $target
+target="http://$hip/"; nikto -maxtime=60s -host=$target >> nikto.txt 2>&1 & dirb $target -S >> dirb.txt 2>&1 & whatweb -v -a 3 $target
 ```
 
 
@@ -13,14 +13,38 @@ for site in {"/robots.txt","/crossdomain.xml","/clientaccesspolicy.xml","/sitema
 
 ##### Detect CMS Used
 ```
-cmsmap -F -d $hip
+cmsmap -F -d http://w222$hip
 ```
 Alternatives:
 - `cmseek -u $hip`
-- `pyenv global 2.7 && python ~/Documents/activeInformationGathering/clusterd/clusterd.py -i $hip --fingerprint`
+- `pyver=$(pyenv global) && pyenv global 2.7 && python ~/Documents/activeInformationGathering/clusterd/clusterd.py -i $hip --fingerprint && pyenv global $pyver`
 
-##### Wordpress
+### Wordpress
 ```bash
-wpscan --url "https://$hip:80" --detection-mode aggressive --plugins-detection aggressive --disable-tls-checks --enumerate ap,vt,cb,dbe | tee wpscan_extended.txt
+wpscan --update --url "https://$hip:80" --detection-mode aggressive --plugins-detection aggressive --disable-tls-checks --enumerate ap,vt,cb,dbe | tee wpscan_extended.txt
 ```
 
+### Drupal
+
+##### Version
+`/CHANGELOG.txt` (Not accessible in newer versions)
+##### User
+Check if user exists by submitting it to /user/register or by requesting a password reset. ("Name is already taken" or "not recognized as user name")
+Count up /user/1 until you get an 404 instead of access denied to get the number of users. (Use the script shown in the next section "Hidden pages")
+
+##### Hidden pages
+Drupal organizes all content in nodes. So try /node/1, /node/2, ... to find hidden pages.
+`mkdir drupalFuzz && cd drupalFuzz && curl "http://$hip/node/[1-5]" -o "#1.html" --silent && grep -i -L "Not Found" -r .`
+
+##### Installed Modules
+Check `/config/sync/core.extension.yml` and `/core/core.services.yml`
+
+##### Script
+`droopescan scan drupal -u http://$hip`
+
+##### Authenticated RCE
+Drupal 8 and below has php module actived by default. Check if vulnerable (Access /modules/php, 403 -> vulnerable, 404 -> not installed).
+Exploit: Login as Admin -> Modules -> Enable PHP Filter (Might need to enable it under People -> Permissions) -> Save Configuration. Add Content -> Write php shellcode on body -> Select PHP Code as Text Format -> Preview. 
+
+##### Loot
+`find / -name settings.php -exec grep "drupal_hash_salt\|'database'\|'username'\|'password'\|'host'\|'port'\|'driver'\|'prefix'" {} \; 2>/dev/null`
