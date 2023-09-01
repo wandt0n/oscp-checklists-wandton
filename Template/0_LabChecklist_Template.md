@@ -3,7 +3,7 @@
 
 1. Create Subfolder in "lab"
 
-> **Update Searchsploit** with `searchsploit -u`
+> **Update Searchsploit** with `searchsploit -u` and Windows Exploit suggester with `wes --update`
 
 # Find Hosts in Subnet
 
@@ -39,7 +39,11 @@ for ip in $(seq 1 254); do host $subnet$ip $dnsserver; done | grep "arpa" | grep
 for ip in $(seq 1 255);do host $subnet$ip $dns_server | grep "arpa" | grep -v "not found"; done
 ```
    Findings:
-   
+
+##### Search SMB Shares
+```bash
+/home/kali/Documents/activeInformationGathering/snaffler.exe -s -o snaffler.log -n $(cat 0_Hosts.txt | sed -z 's/\n/,/g;s/,$/\n/')
+```
 ---
 # Create working dirs and start individual system scanning
 
