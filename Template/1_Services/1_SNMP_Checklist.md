@@ -2,7 +2,7 @@
 
 ## Find hosts with onesixtyone
 ```bash
-echo -e "private\npublic\nmanager" > snmp_communityStrings.txt
+echo -e "private\npublic\nmanager\ncable-docsis\nILMI" > snmp_communityStrings.txt
 ```
 
 ```bash

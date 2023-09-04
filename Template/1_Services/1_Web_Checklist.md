@@ -24,6 +24,10 @@ Alternatives:
 wpscan --update --url "https://$hip:80" --detection-mode aggressive --plugins-detection aggressive --disable-tls-checks --enumerate ap,vt,cb,dbe | tee wpscan_extended.txt
 ```
 
+##### Loot
+```bash
+find / -name "setup-config.php" -o -name "wp-config.php"
+```
 ### Drupal
 
 ##### Version
@@ -48,3 +52,14 @@ Exploit: Login as Admin -> Modules -> Enable PHP Filter (Might need to enable it
 
 ##### Loot
 `find / -name settings.php -exec grep "drupal_hash_salt\|'database'\|'username'\|'password'\|'host'\|'port'\|'driver'\|'prefix'" {} \; 2>/dev/null`
+
+### Joomla
+```bash
+./joomlascan.py $hip
+```
+##### Loot
+```bash
+find / -name "configuration.php" -o -name "diagnostics.php" -o -name "joomla.inc.php" -o -name "config.inc.php"
+```
+
+

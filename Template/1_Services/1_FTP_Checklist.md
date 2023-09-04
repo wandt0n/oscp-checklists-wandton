@@ -2,14 +2,20 @@
 > With IIS: `C:\inetpub\wwwroot`
 
 
-Anonymous Login?
+Anonymous Login? (anonymous or anon)
 
 Use `ls -al` to see hidden files via ftp
 
 ## Bruteforce default credentials
 ```
-hydra -C /usr/share/wordlists/seclists/Passwords/Default-Credentials/ftp-betterdefaultpasslist.txt $service://$hip -vV -t 1 -I -s $hport
+hydra -C /usr/share/wordlists/seclists/Passwords/Default-Credentials/ftp-betterdefaultpasslist.txt ftp://$hip -vV -t 1 -I -s 21
 ```
 	
 
 # Findings
+
+
+# Loot
+```bash
+find / -name "ftpusers" -o -name "ftp.conf" -o -name "proftpd.conf"
+```

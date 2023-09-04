@@ -50,7 +50,7 @@ ip a; /sbin/route; netstat -anp; sudo iptables -S
 	
 ##### Interesting files
 ```bash
-ls /home/*/.gpg/; ls /home/*/.ssh/; cat /home/*/.*_history; find / -name ".git" 2>/dev/null | cd | git config --list 2>/dev/null
+ls /home/*/.gpg/; ls /home/*/.ssh/; cat /home/*/.*_history; find / -name ".git" 2>/dev/null | cd | git config --list 2>/dev/null; ls -alh /var/mail/
 ```
 	
 ##### Home folder
@@ -58,10 +58,6 @@ ls /home/*/.gpg/; ls /home/*/.ssh/; cat /home/*/.*_history; find / -name ".git" 
 ls -al /home/*/; ls -al /root/; find / -user $(id -un) -type f 2>/dev/null | grep -Ev "^/sys|^/run|^/proc"
 ```
 	
-##### Advanced
-X-Server: `pidof X`  (Extract cookies/passwords from browser with `pasco index.dat`)
-Mounted Volumes: `cat /etc/fstab; mount; /bin/lsblk`
-Drivers: `lsmod`, `/sbin/modinfo [module]`
 # PrivEsc
 Find Working Dir for attack
 ```bash
