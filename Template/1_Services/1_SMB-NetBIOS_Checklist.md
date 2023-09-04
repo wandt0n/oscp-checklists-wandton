@@ -27,7 +27,7 @@ nmap --script "safe and smb-enum-*" -p 445 $hip
 ```bash
 rpcclient -U "username%passwd" $hip
 ```
-Without creds: `-U "" -N`
+Without creds: `-U "" -N`. Then use `querydispinfo` and `enumdomusers`
 
 ## List files in SMB share
 ```bash
@@ -45,7 +45,7 @@ smbclient //<IP>/<share>
 
 ## Check for valid domain credentials
 ```bash
-crackmapexec smb $hip -u /home/kali/oscp/Manuals/7_smb_default_usernames.txt -p /home/kali/oscp/Manuals/7_smb_default_passwords.txt --continue-on-success | grep '+'
+crackmapexec smb $hip -u /home/kali/oscp/Manuals/9_smb_default_usernames.txt -p /home/kali/oscp/Manuals/9_smb_default_passwords.txt --continue-on-success | grep '+'
 ```
 
 Find a specific SMB user in many machines

@@ -11,13 +11,8 @@ onesixtyone -c snmp_communityStrings.txt -i ips.txt
 	
 
 ## Enumerate MIB Tree
-The whole Tree
 ```bash
-snmpwalk -c public -v1 -t 10 $hip > snmp_tree.txt
-```
-Or specific lleafs of interest:
-```bash
-snmpwalk -c public -v1 $ip 
+snmpwalk -c public -v1 $hip $leaf
 ```
 ("public" is the default community string. It might be changed by the netadmins)
 

@@ -8,7 +8,7 @@ Use `ls -al` to see hidden files via ftp
 
 ## Bruteforce default credentials
 ```
-hydra -C /usr/share/wordlists/seclists/Passwords/Default-Credentials/ftp-betterdefaultpasslist.txt ftp://$hip -vV -t 1 -I -s 21
+hydra -C /usr/share/seclists/Passwords/Default-Credentials/ftp-betterdefaultpasslist.txt ftp://$hip -vV -t 1 -I -s 21
 ```
 	
 

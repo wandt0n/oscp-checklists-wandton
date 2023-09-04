@@ -1,4 +1,4 @@
-<% tp.file.rename("1_NFS-RPCBIND_")%>
+<% tp.file.rename("1_RPCBIND-NFS_")%>
 
 > RPCBind (Port 111) is used to communicate between Unix systems. Can be used for enumeration.
 
@@ -6,8 +6,7 @@
 ```bash
 rpcinfo -s $hip
 ```
-
-> Look for nfs, ypbind and ruserd
+Use `-p` instead for msrpc. Look for nfs, ypbind and ruserd. Ignore nlockmgr, status, portmapper, and mountd
 
 # NFS
 

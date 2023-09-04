@@ -1,21 +1,15 @@
 <% tp.file.rename("1_Web_")%>
 
-## Start scans
+## Start Enum
 ```bash
-target="http://$hip/"; nikto -maxtime=60s -host=$target >> nikto.txt 2>&1 & dirb $target -S >> dirb.txt 2>&1 & whatweb -v -a 3 $target
+target="http://192.168./"; \
+for site in {"robots.txt","crossdomain.xml","clientaccesspolicy.xml","sitemap.xml",".well-known/"}; do firefox "$target$site"; done && \
+whatweb -v -a 3 $target | tee webeval.txt && \
+dirb $target -S | tee webeval.txt && \
+nikto -maxtime=60s -host=$target | tee webeval.txt && \
+cmsmap -F -d $target | tee webeval.txt
 ```
-
-
-##### Check interesting sites
-```bash
-for site in {"/robots.txt","/crossdomain.xml","/clientaccesspolicy.xml","/sitemap.xml","/.well-known/"}; do firefox "http://$hip$site"; done
-```
-
-##### Detect CMS Used
-```
-cmsmap -F -d http://w222$hip
-```
-Alternatives:
+Alternatives for CMS checking:
 - `cmseek -u $hip`
 - `pyver=$(pyenv global) && pyenv global 2.7 && python ~/Documents/activeInformationGathering/clusterd/clusterd.py -i $hip --fingerprint && pyenv global $pyver`
 

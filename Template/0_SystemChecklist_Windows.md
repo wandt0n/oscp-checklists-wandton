@@ -3,7 +3,7 @@
 # Enumeration
 
 ```bash
-mkdir /oscp/lab/x
+export hip="";nmap --top-ports 30 $hip
 ```
 
 ```bash
@@ -14,17 +14,15 @@ i="$hip";sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.
 
 # Initial Foothold
 
-##### Utilized software versions
-```
+### Software Versions
 
-```
-`searchsploit` and Google Dorks
-##### NSE scripts
-```bash
-ls /usr/share/nmap/scripts
-```
+	 `searchsploit` and Google Dorks
 
-> Also, use the service templates
+### Insecure configurations
+> Use the service template to document possible attack vectors and document here which worked
+##### Insecure configuration 1
+	NSE scripts: `ls /usr/share/nmap/scripts`
+
 # Loot
 
 Hostname `hostname`
