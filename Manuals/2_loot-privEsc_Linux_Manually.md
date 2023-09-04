@@ -131,6 +131,10 @@ find / -name ".git" 2>/dev/null (cd to the directories and do "git config --list
 ```bash
 cat /etc/fstab; mount; /bin/lsblk
 ```
+##### Printers
+```bash
+lpstat -a
+```
 ##### Drivers
 ```bash
 lsmod
