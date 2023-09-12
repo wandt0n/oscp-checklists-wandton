@@ -1,4 +1,6 @@
+#service 
 <% tp.file.rename("1_NTP_")%>
+☑️
 
 ```bash
 ntpq $hip

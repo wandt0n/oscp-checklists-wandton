@@ -1,4 +1,10 @@
-<% tp.file.rename("0_SystemChecklist")%>
+#show #windows
+<%*
+const path = tp.file.folder(true).split('/');
+const filename = "0_Win_" + path[path.length - 1];
+await tp.file.rename(filename);
+tR += "Part of " + "[" + "[" + "0_Lab_" + path[path.length - 2] + "]]";
+-%>
 
 # Enumeration
 
@@ -7,7 +13,7 @@ export hip="";nmap --top-ports 30 $hip
 ```
 
 ```bash
-i="$hip";sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -T 5 -sUV --top-ports 100 $i -oN 0_udp_top100.txt
+i="$hip";sudo nmap --osscan-guess -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -sUV --top-ports 100 $i -oN 0_udp_top100.txt
 ```
 
 > Then, create services templates.
@@ -20,12 +26,16 @@ i="$hip";sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.
 
 ### Insecure configurations
 > Use the service template to document possible attack vectors and document here which worked
-##### Insecure configuration 1
-	NSE scripts: `ls /usr/share/nmap/scripts`
+> NSE scripts: `ls /usr/share/nmap/scripts`
+> Run the following for all services: `nmap --script "safe and smb-*" $hip`. If nothing helps, try `nmap --script "smb-vuln-*" $hip`
+
 
 # Loot
 
 Hostname `hostname`
+	
+
+Flag `type C:\Users\Administrator\Desktop\proof.txt`
 	
 ##### Users
 ```powershell
@@ -44,7 +54,7 @@ Get-ChildItem -Path C:\ -Include *.kdbx -Include *password* -Include proof.txt -
 	
 ##### Home folder
 ```powershell
-Get-ChildItem -Recurse -Path C:\Users\offsec | select Parent,Name
+Get-ChildItem -Recurse -Path C:\Users\ | select Parent,Name
 ```
 	
 Alternative: `dir /B /S /A-D`

@@ -1,6 +1,9 @@
-<% tp.file.rename("0_LabChecklist")%>
-
-
+<%*
+const path = tp.file.folder(true).split('/');
+const filename = "0_Lab_" + path[path.length - 1];
+await tp.file.rename(filename)
+-%>
+#show
 1. Create Subfolder in "lab"
 
 > **Update Searchsploit** with `searchsploit -u` and Windows Exploit suggester with `wes --update`
@@ -44,6 +47,7 @@ for ip in $(seq 1 255);do host $subnet$ip $dns_server | grep "arpa" | grep -v "n
 ```bash
 /home/kali/Documents/activeInformationGathering/snaffler.exe -s -o snaffler.log -n $(cat 0_Hosts.txt | sed -z 's/\n/,/g;s/,$/\n/')
 ```
+> Does not work on Linux, as of yet
 ---
 # Create working dirs and start individual system scanning
 

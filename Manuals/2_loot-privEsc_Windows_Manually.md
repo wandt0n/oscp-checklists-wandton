@@ -83,7 +83,6 @@ findstr /si password *.xml *.ini *.txt
 ```
 net share
 ```
-Alternative: `Find-DomainShare -ComputerDomain domain.local`
 
 ##### Running processes
 ```powershell
@@ -191,7 +190,7 @@ wmic qfe get Caption"," Description"," HotFixID"," InstalledOn
 ```
 ##### History
 ```powershell
-Get-History; (Get-PSReadlineOption).HistorySavePath | cat -
+Get-History; (Get-PSReadlineOption).HistorySavePath
 ```
 
 ##### LOLBAS

