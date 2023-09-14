@@ -1,2 +1,5 @@
 Service checked: ☑️
-Wichtiger Service:❕ ^b2bbe5
+Shell on system: ☑️
+System pwned: ✅
+Wichtiger Service:❕
+Wichtige Erkenntnis: `<font style="color:red"> </font>`

