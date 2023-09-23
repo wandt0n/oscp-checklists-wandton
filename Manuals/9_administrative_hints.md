@@ -1,6 +1,10 @@
 ### For Loop
 `for i in $(command | tr '\n' ' '); do command; done`
 
+### Find Flag
+```bash
+grep -rn / -e "OS{" 2>/dev/null
+```
 ### Set Terminal name
 ```bash
 export PS1="$PS1\[\e]0;NAME\a\]"

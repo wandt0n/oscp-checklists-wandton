@@ -19,8 +19,20 @@ For LM Hashs:
 2. Run john with `--format=LM --show` and without attack type (e.g. wordlist). It will identify 2 hashes per lines, bc LM hashes can be cracked partly. Also, if it displays `????`, this part of the LM wasn't cracked yet. But it needs to.
 3. Figure out capitalization of password. I've created a script to get that using the NTML Hash (did I ever test it?...). Alternatively, create wordlist file with only the found password canidate in uppercase. Run john with `--rules --format=NT --wordlist=` to get the password correctly capitalized. ![[checkLMagainstNTLM.py]]
 #### Hashcat
+Kerberos AS-REP
+```bash
+sudo hashcat -m 18200 hashes.asreproast /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
+```
+Kerberos TGS-REP
+```bash
+sudo hashcat -m 13100 hashes.kerberoast /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
+```
+NTLM Hash
+```bash
+sudo hashcat -m 1000 NTLMHashes.txt /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
+```
 NT Hash
-```powershell
+```bash
 hashcat -a 3 -m 900 --encoding-to utf16le NTHashes.txt
 ```
 #### If set through GPP

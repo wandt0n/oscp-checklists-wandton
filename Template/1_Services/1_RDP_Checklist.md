@@ -9,7 +9,10 @@
 hydra -C /usr/share/seclists/Passwords/Default-Credentials/windows-betterdefaultpasslist.txt rdp://$hip -vV -t 1 -I -s 3389
 ```
 	CAREFUL, likely to lock accounts!
-
+Or for a given user:
+```bash
+hydra -l $user -P /usr/share/wordlists/rockyou30.txt rdp://$hip -V -t 4 -I -s 3389
+```
 ## Connect to RDP
 ```bash
 connect-windows $hip [$user] [$password]

