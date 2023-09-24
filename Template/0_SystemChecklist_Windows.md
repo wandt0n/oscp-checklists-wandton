@@ -86,6 +86,7 @@ wes --muc-lookup systeminfo.txt
 Consider [[3_dllHijacking_guide]]
 
 Ways to login as another user:
+- `impacket-psexec '$user:$password@$hip'` oder `impacket-psexec -hashes 00000000000000000000000000000000:$ntlm_hash '$user@$hip'`
 - If we have access to the GUI -> `RunAs /user:$user cmd`
 - User is in group _Remote Desktop Users_ -> RDP
 - User is in group _Remote Management Users_ -> WinRM (Better use [evil-winrm](https://github.com/Hackplayers/evil-winrm) from non-interactive shells)

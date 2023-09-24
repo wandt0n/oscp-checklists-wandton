@@ -66,6 +66,8 @@ ssh -f -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/de
 `proxychains <command>` to start e.g. a nmap scan over the pivot
 > Warning: It appears to then not use the IP-Addresses put into `/etc/hosts`
 
+You can test the connection with `proxychains nmap -Pn $hip -p $hport`
+
 ### Remote Dynamic with sshuttle
 > Requires python on machine A!
 

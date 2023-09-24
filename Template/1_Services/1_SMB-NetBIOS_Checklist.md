@@ -27,7 +27,7 @@ Without creds: `-U "" -N`. Then use `querydispinfo` and `enumdomusers`
 ```bash
 crackmapexec smb $hip -u $user -p "$password" --shares
 ```
-(`$users` can be `$(cat ../0_Users_Hashes.md | cut -d ":" -f 1)`)
+(`$users` can be `$(find . -name "9*.md" -print | cut -d "/" -f2 | cut -d "." -f1 | cut -d "_" -f2 | cut -d " " -f 1)`)
 Alternativ: `net view \\dc01 /all`
 ## List files in SMB share
 ```bash

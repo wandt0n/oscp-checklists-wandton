@@ -27,11 +27,13 @@ AUSPROBIEREN: wfuzz
 ```bash
 wpscan --update --url "https://$hip:80" --detection-mode aggressive --plugins-detection aggressive --disable-tls-checks --enumerate ap,vt,cb,dbe | tee wpscan_extended.txt
 ```
-
+##### RCE Wordpress
+Upload an new plugin, just containing your shell.php. Then, go to media center, grap the path to that file and access it. 
 ##### Loot Wordpress
 ```bash
 find / -name "setup-config.php" -o -name "wp-config.php"
 ```
+
 ### Drupal
 
 ##### Version
