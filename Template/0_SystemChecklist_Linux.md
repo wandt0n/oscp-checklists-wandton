@@ -1,7 +1,7 @@
 #show #linux
 <%*
 const path = tp.file.folder(true).split('/');
-const filename = "0_A_Linux_" + path[path.length - 1];
+const filename = "0_A_" + path[path.length - 1];
 await tp.file.rename(filename);
 tR += "Part of " + "[" + "[" + "0_Lab_" + path[path.length - 2] + "]]";
 -%>

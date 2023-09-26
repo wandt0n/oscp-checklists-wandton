@@ -4,11 +4,11 @@
 ## Start Enum
 ```bash
 export target="http://192.168./"; \
-for site in {"robots.txt","crossdomain.xml","clientaccesspolicy.xml","sitemap.xml",".well-known/"}; do firefox "$target$site"; done && \
-whatweb -v -a 3 $target | tee webeval.txt && \
-dirb $target -S | tee webeval.txt && \
-nikto -maxtime=60s -host=$target | tee webeval.txt && \
-cmsmap -F -d $target | tee webeval.txt
+for site in {"robots.txt","crossdomain.xml","clientaccesspolicy.xml","sitemap.xml",".well-known/"}; do chromium "$target$site" &> /dev/null & done && \
+whatweb -v -a 3 $target | tee -a webeval.txt && \
+dirb $target -S | tee -a webeval.txt && \
+nikto -maxtime=60s -host=$target | tee -a webeval.txt && \
+cmsmap -F -d $target | tee -a webeval.txt
 ```
 AUSPROBIEREN: `skipfish -o skipfish.txt $target`
 Alternative for Dir Spidering:

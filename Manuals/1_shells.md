@@ -169,6 +169,7 @@ Check wheter we are in CMD or Powershell
 ```
 (dir 2>&1 *`|echo CMD);&<# rem #>echo PowerShell
 ```
+	Webencoded: (dir%202%3E%261%20*%60%7Cecho%20CMD)%3B%26%3C%23%20rem%20%23%3Eecho%20PowerShell
 Check if `bash` is interactive
 ```bash
 [[ $- == *i* ]] && echo 'Interactive' || echo 'Not interactive'

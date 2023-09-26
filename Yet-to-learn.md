@@ -1,5 +1,3 @@
-- Read the Web Application Attacks Chapters from the manual
 - Continue the manual on chapter 25.2
-- Read Manual 15.3.3 and 15.3.4
 - All the Topics in linpeas script
 - Convert MSF Exploit to standalone, see http://web.archive.org/web/20190707074139/http://netsec.ws/?p=262

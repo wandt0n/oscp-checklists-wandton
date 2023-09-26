@@ -3,6 +3,7 @@
 ☑️
 
 > RPCBind (Port 111) is used to communicate between Unix systems. Can be used for enumeration.
+> MSRPC uses port 135
 
 #### rpcinfo
 ```bash

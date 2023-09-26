@@ -1,7 +1,7 @@
 #show #windows
 <%*
 const path = tp.file.folder(true).split('/');
-const filename = "0_A_Win_" + path[path.length - 1];
+const filename = "0_A_" + path[path.length - 1];
 await tp.file.rename(filename);
 tR += "Part of " + "[" + "[" + "0_Lab_" + path[path.length - 2] + "]]";
 -%>
@@ -49,7 +49,7 @@ ipconfig /all; route print; netstat -ano; netsh advfirewall show currentprofile,
 
 ##### Interesting files
 ```powershell
-Get-ChildItem -Path C:\ -Include *.kdbx -Include *password* -Include proof.txt -Include local.txt -Include sysprep.inf -Include Unattended.xml -File -Recurse -ErrorAction SilentlyContinue; Get-ChildItem -Path C:\Users\ -Include *.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx -File -Recurse -ErrorAction SilentlyContinue; Get-History; (Get-PSReadlineOption).HistorySavePath | cat - ; 
+Get-ChildItem -Path C:\ -Include *.kdbx,*password*,proof.txt,local.txt,sysprep.inf,Unattended.xml -File -Recurse -ErrorAction SilentlyContinue; Get-ChildItem -Path C:\Users\ -Include *.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx -File -Recurse -ErrorAction SilentlyContinue; Get-History; type (Get-PSReadlineOption).HistorySavePath
 ```
 	
 ##### Home folder

@@ -4,7 +4,8 @@ const filename = "0_Lab_" + path[path.length - 1];
 await tp.file.rename(filename)
 -%>
 #show
-1. Create Subfolder in "lab"
+
+Clean the `/etc/hosts` file and link it with `ln -s /etc/hosts ./0_Hosts`
 
 > **Update Searchsploit** with `searchsploit -u` and Windows Exploit suggester with `wes --update`
 
@@ -35,12 +36,6 @@ Reverse DNS Lookup
 for ip in $(seq 1 254); do host $subnet$ip $dnsserver; done | grep "arpa" | grep -v "not found"
 ```
    Findings:
-
-ARP bruteforce
-```
-for ip in $(seq 1 255);do host $subnet$ip $dns_server | grep "arpa" | grep -v "not found"; done
-```
-   Findings:
 ##### Continue
 ---
 ##### Search SMB Shares
@@ -55,7 +50,7 @@ sudo nbtscan -r $subnet0/24
 ##### Create working dirs and start individual system scanning
 
 ```bash
-for i in $(cat 0_Hosts.txt); do (mkdir $i && cd $_ && sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -T 5 -sUV --top-ports 100 $i -oN 0_udp_top100.txt)& done
+for i in $(tail -n 4 0_Hosts); do (mkdir $i && cd $_ && sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -sUV --top-ports 100 $i -oN 0_udp_top100.txt)& done
 ```
 
 For single host:

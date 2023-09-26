@@ -22,3 +22,12 @@
 	- Wildcard characters can sometimes present DoS issues or information disclosure.
 - `Ax1024+`
 	- Overflow vulnerabilities.
+
+Also: Useful webencoded chars:
+- `%20` == ` `
+- `%23` == `#`
+- `%2E` == `.`
+- `%3B` == `;`
+- `%3E` == `<`
+- `%26` == `&`
+- `%7C` == `|`

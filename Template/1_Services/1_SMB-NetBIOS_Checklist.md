@@ -1,5 +1,5 @@
 #service 
-<% tp.file.rename("1_SMB-NetBIOS_")%>
+<% tp.file.rename("1_SMB-NetBIOS_445-139")%>
 ☑️
 
 # Initial Enumeration
@@ -9,7 +9,7 @@ enum4linux -a $hip
 ```
 ## Get SMB version
 ```bash
-crackmapexec smb $hip
+crackmapexec smb $hip 2>/dev/null
 ```
 Alternativ: [grab_smbversion.sh](file:////home/kali/Documents/activeInformationGathering/)
 ## NSE
