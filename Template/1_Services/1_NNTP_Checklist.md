@@ -1,5 +1,5 @@
 #service 
-<% tp.file.rename("1_NNTP_")%>
+<% tp.file.rename("1_NNTP_119")%>
 ☑️
 
 ## NTP Commands

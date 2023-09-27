@@ -1,5 +1,5 @@
 #service 
-<% tp.file.rename("1_SSH_")%>
+<% tp.file.rename("1_SSH_22")%>
 ☑️
 #### Bad Keys
 Get entries from targets `authorized_keys` file. Then:

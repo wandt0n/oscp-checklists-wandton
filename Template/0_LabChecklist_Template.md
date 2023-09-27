@@ -1,6 +1,6 @@
 <%*
 const path = tp.file.folder(true).split('/');
-const filename = "0_Lab_" + path[path.length - 1];
+const filename = "0_A_Network" + path[path.length - 1];
 await tp.file.rename(filename)
 -%>
 #show
@@ -15,7 +15,7 @@ Clean the `/etc/hosts` file and link it with `ln -s /etc/hosts ./0_Hosts`
 Change SUBNET in the following line (keep the point)
 
 ```
-export subnet="SUBNET." && nmap -T 5 -sn $subnet"1-254" -oG - | grep "Status: Up" | cut -d " " -f 2 > 0_Hosts.txt
+export subnet="SUBNET." && nmap -T 5 -sn $subnet"1-254" -oG - | grep "Status: Up" | cut -d " " -f 2 >> 0_Hosts.txt
 ```
 ---
 Find local DNS Servers and attempt transfer
@@ -50,7 +50,7 @@ sudo nbtscan -r $subnet0/24
 ##### Create working dirs and start individual system scanning
 
 ```bash
-for i in $(tail -n 4 0_Hosts); do (mkdir $i && cd $_ && sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -sUV --top-ports 100 $i -oN 0_udp_top100.txt)& done
+for i in $(tail -n 4 0_Hosts); do (mkdir -p "A_$i" && cd $_ && sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -sUV --top-ports 100 $i -oN 0_udp_top100.txt)& done
 ```
 
 For single host:

@@ -292,7 +292,7 @@ Then access this symlink
 ##### Potatoes
 Hot Potato is patched in MS16-075
 Juicy (> Lonely > Rotten) Potato for machines < Windows 10 1809 & Windows Server 2019
-Otherwise: Rogue Potato
+For higher versions: Rogue Potato
 But: **Sweet Potato can do it all**
 Except when the print service is not running. Then try Generic Potato
 ##### HiveNightmare

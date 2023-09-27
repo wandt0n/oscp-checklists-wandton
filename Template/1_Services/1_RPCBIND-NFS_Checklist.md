@@ -1,15 +1,12 @@
 #service 
-<% tp.file.rename("1_RPCBIND-NFS_")%>
+<% tp.file.rename("1_RPCBIND-NFS_111-2049")%>
 ☑️
-
-> RPCBind (Port 111) is used to communicate between Unix systems. Can be used for enumeration.
-> MSRPC uses port 135
 
 #### rpcinfo
 ```bash
 rpcinfo -s $hip
 ```
-Use `-p` instead for msrpc. Look for nfs, ypbind and ruserd. Ignore nlockmgr, status, portmapper, and mountd
+Look for nfs, ypbind and ruserd. Ignore nlockmgr, status, portmapper, and mountd
 
 # NFS
 

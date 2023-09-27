@@ -6,6 +6,15 @@ e.g. iterate over found ips in 172er subnet: `for hip in $(cat /etc/hosts | grep
 find . -name "9*.md" -print | cut -d "/" -f2 | cut -d "." -f1 | cut -d "_" -f2 | cut -d " " -f 1 > users.txt
 ```
 
+### Multiple Layers of quotes
+##### Linux
+Use Arrays.
+```bash
+ARG1=("works"); yes "that ${ARG1[@]}"
+```
+##### Windows
+Escape quotes with `\"` in CMD and with a backtick \`" in Powershell. Or use variables like `$ARG1 = "works" ; yes "that $ARG1"`
+
 ### Find Flag
 ```bash
 grep -rn / -e "OS{" 2>/dev/null
