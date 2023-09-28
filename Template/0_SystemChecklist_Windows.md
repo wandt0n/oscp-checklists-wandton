@@ -39,7 +39,7 @@ Alternativ: [grab_smbversion.sh](file:////home/kali/Documents/activeInformationG
 Hostname `hostname`
 	
 
-Flag `type C:\Users\Administrator\Desktop\proof.txt`
+Flag `type C:\Users\Administrator\Desktop\proof.txt` or local.txt for non-elevated
 	
 ##### Users
 ```powershell
@@ -53,15 +53,9 @@ ipconfig /all; route print; netstat -ano; netsh advfirewall show currentprofile,
 
 ##### Interesting files
 ```powershell
-Get-ChildItem -Path C:\ -Include proof.txt,local.txt -File -Recurse -ErrorAction SilentlyContinue; Get-ChildItem -Path C:\Users\ -Include *.kdbx,*.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx -File -Recurse -ErrorAction SilentlyContinue; Get-History; type (Get-PSReadlineOption).HistorySavePath
+Get-ChildItem -Recurse -Path C:\Users\ -File -Exclude Desktop.lnk,Downloads.lnk,Bing.url | select Name,Directory; Get-ChildItem -Path C:\Users\ -Include *.kdbx,*.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx -File -Recurse -ErrorAction SilentlyContinue; Get-History; type (Get-PSReadlineOption).HistorySavePath
 ```
-	
-##### Home folder
-```powershell
-Get-ChildItem -Recurse -Path C:\Users\ | select Parent,Name
-```
-	
-Alternative: `dir /B /S /A-D`
+
 ##### Advanced
 Mounted Volumes: `mountvol`
 Devices: `Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName, DriverVersion, Manufacturer`

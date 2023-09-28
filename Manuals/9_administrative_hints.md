@@ -15,6 +15,10 @@ ARG1=("works"); yes "that ${ARG1[@]}"
 ##### Windows
 Escape quotes with `\"` in CMD and with a backtick \`" in Powershell. Or use variables like `$ARG1 = "works" ; yes "that $ARG1"`
 
+### Change IP-Tupel in /etc/hosts
+```bash
+sed -i 's/old/new/g' 0_Hosts
+```
 ### Find Flag
 ```bash
 grep -rn / -e "OS{" 2>/dev/null
@@ -27,7 +31,17 @@ export PS1="$PS1\[\e]0;NAME\a\]"
 sudo gem install bundler -v 2.2.4; sudo msfdb reinit; sudo msfconsole
 (https://stackoverflow.com/questions/65941317/metasploit-crashed-after-upgrade)
 
-
+### Windows
+Restart Computer with Powershell
+```powershell
+Restart-Computer -Force
+```
+Create New Admin User
+```powershell
+$pw=ConvertTo-SecureString -AsPlainText -Force -String "Admin1234=" ; New-LocalUser "tempadmin" -Password $pw -FullName "Petrus Testus" -Description "Temporary local admin"; Add-LocalGroupMember -Group "Administrators" -Member "tempadmin"
+```
+Change Group membership
+`Add-LocalGroupMember -Group "Remote Desktop Users" -Member foo`
 ### Switch Python versions
 List available python installs: `pyenv versions`
 Set version as default for python: `pyenv global [version]`

