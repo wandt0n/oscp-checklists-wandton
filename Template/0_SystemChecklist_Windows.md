@@ -6,8 +6,8 @@ await tp.file.rename(filename);
 tR += "Part of " + "[" + "[" + "0_Lab_" + path[path.length - 2] + "]]";
 -%>
 
-Shell on system: ☑️
-System pwned: ✅
+First flag: ☑️
+Second flag: ✅
 
 # Enumeration
 ##### Enum4Linux

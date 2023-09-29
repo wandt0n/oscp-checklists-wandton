@@ -17,7 +17,7 @@ Escape quotes with `\"` in CMD and with a backtick \`" in Powershell. Or use var
 
 ### Change IP-Tupel in /etc/hosts
 ```bash
-sed -i 's/old/new/g' 0_Hosts
+sudo sed -i 's/old/new/g' /etc/hosts
 ```
 ### Find Flag
 ```bash

