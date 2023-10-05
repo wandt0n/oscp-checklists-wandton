@@ -3,12 +3,8 @@
 ☑️
 
 ```bash
-ntpq $hip
+ntpq -c "host" -c "hostname" -c "version" -c "ntpversion" -c "readlist" -c "readvar" -c "associations" -c "peers" -c "sysinfo" $hip
 ```
-
-- `host`, `hostname`
-- `ntpversion`, `version`
-- `readlist`
 
 # Findings
 

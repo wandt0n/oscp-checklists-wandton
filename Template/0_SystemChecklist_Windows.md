@@ -10,18 +10,18 @@ First flag: ☑️
 Second flag: ✅
 
 # Enumeration
-##### Enum4Linux
+##### MSRPC (135, 593)
 ```bash
-enum4linux -a $hip
+impacket-rpcdump $hip | grep '12345778-1234-abcd-ef00-0123456789ab\|3919286a-b10c-11d0-9ba8-00c04fd92ef5\|12345778-1234-abcd-ef00-0123456789ac\|1ff70682-0a51-30e8-076d-740be8cee98b\|338cd001-2244-31f1-aaaa-900038001003\|367abb81-9844-35f1-ad32-98f038001003\|4b324fc8-1670-01d3-1278-5a47bf6ee188\|4d9f4ab8-7d1c-11cf-861e-0020af6e7c57'
 ```
-If Null-Session is not restricted, also use `rpcclient -U "" -N $hip` with `querydispinfo` and `enumdomusers`. If used with proxy, use `proxychains -q`
-##### Get SMB version
+
+##### SMB (139, 445) #login
 ```bash
-crackmapexec smb $hip 2>/dev/null
+i=$hip; enum4linux -a $i ; enum4linux-ng -A $i ; crackmapexec smb $i 2>/dev/null
 ```
+If used with proxy, use `proxychains -q`. Provide creds with `-u "<username>" -p "<passwd>"` 
+Username can be `$(find . -name "9*.md" -print | cut -d "/" -f2 | cut -d "." -f1 | cut -d "_" -f2 | cut -d " " -f 1)`
 Alternativ: [grab_smbversion.sh](file:////home/kali/Documents/activeInformationGathering/)
-
-
 # Initial Foothold
 
 ### Software Versions

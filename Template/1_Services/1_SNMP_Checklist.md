@@ -10,7 +10,6 @@ echo -e "private\npublic\nmanager\ncable-docsis\nILMI" > snmp_communityStrings.t
 ```bash
 onesixtyone -c snmp_communityStrings.txt -i ips.txt
 ```
-	
 
 ## Enumerate MIB Tree
 ```bash
@@ -27,6 +26,7 @@ snmpwalk -c public -v1 $hip $leaf
 |Storage Units|1.3.6.1.2.1.25.2.3.1.4||
 |System Processes|1.3.6.1.2.1.25.1.6.0||
 |Processes Path|1.3.6.1.2.1.25.4.2.1.4||
+|System Description|1.3.6.1.2.1.1.1.0||
 
-
+Within the whole MIB Tree, also look for the words "trap" and "fail".
 # Findings

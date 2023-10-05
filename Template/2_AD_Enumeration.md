@@ -42,15 +42,14 @@ When done, transfer the .zip to kali ([[2_fileTransfer]])
 
 3. **Analyze data (Kali)**
 	1. In the Web-Interface, use the "Upload Data" function to upload the .zip
-	2. Click the "More Info" tab on the top left. Change to tab "Analysis"
-	3. Enter `MATCH (m:Computer) RETURN m` as raw query on the bottom. Right-click the node and select "Mark as Owned"
-	4. Same for `m:User`
-	5. Run the following analysis:
+	2. Enter `MATCH (m:Computer) RETURN m` as raw query on the bottom. Right-click the node and select "Mark as Owned"
+	3. Same for `m:User`
+	4. Click the "More Info" tab on the top left. Change to tab "Analysis" and run the following analysis:
 		1. _Shortest Paths to Domain Admins from Owned Principals_
 		2. _Find Workstations where Domain Users can RDP_
 		3. _Find Servers where Domain Users can RDP_
 		4. _Find Computers where Domain Users are Local Admin_
-	6. Check Relation-Ships with `MATCH p = (c:Computer)-[:HasSession]->(m:User) RETURN p`
+	5. Check Relation-Ships with `MATCH p = (c:Computer)-[:HasSession]->(m:User) RETURN p`
 	Tips: Use the Control-Key to show information about all nodes. Look for the "?" Help menu, it also contains abuse possibilities.
 
 # Yet-to-test attacks

@@ -7,13 +7,12 @@ find . -name "9*.md" -print | cut -d "/" -f2 | cut -d "." -f1 | cut -d "_" -f2 |
 ```
 
 ### Multiple Layers of quotes
-##### Linux
-Use Arrays.
+Linux: Use Arrays.
 ```bash
 ARG1=("works"); yes "that ${ARG1[@]}"
 ```
-##### Windows
-Escape quotes with `\"` in CMD and with a backtick \`" in Powershell. Or use variables like `$ARG1 = "works" ; yes "that $ARG1"`
+
+Windows: Escape quotes with `\"` in CMD and with a backtick \`" in Powershell. Or use variables like `$ARG1 = "works" ; yes "that $ARG1"`
 
 ### Change IP-Tupel in /etc/hosts
 ```bash

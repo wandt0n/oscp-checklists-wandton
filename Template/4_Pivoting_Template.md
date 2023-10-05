@@ -81,7 +81,6 @@ Within an exististing session:
 2. `use post/multi/manage/autoroute`, `set session 1`, and `run -j` (adjust the session number)
 3. `use auxiliary/server/socks_proxy`, `set VERSION 5`, `set SRVHOST 127.0.0.1`, `set SRVPORT 9989`, and `run -j`
 4. Add `socks5 127.0.0.1 9989` to `/etc/proxychains4.conf` 
-
 # Fault handling
 Test the connection
 `proxychains nmap -Pn $hip -p $hport`

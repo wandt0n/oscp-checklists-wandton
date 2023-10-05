@@ -5,9 +5,10 @@ await tp.file.rename(filename)
 -%>
 #show
 
-Clean the `/etc/hosts` file and link it with `ln -s /etc/hosts ./0_Hosts`
-
-> **Update Searchsploit** with `searchsploit -u` and Windows Exploit suggester with `wes --update`
+1. Clean the `/etc/hosts` file and link it with `ln -s /etc/hosts ./0_Hosts`
+2. Update Searchsploit with `searchsploit -u`
+3. Update Windows Exploit suggester with `wes --update`
+4. Remove neo4j db with `sudo rm -rf /etc/neo4j/data/*`
 
 <font style="color:red">NEXT TIME, START TO LOG TO TRAFFIC VOLUME WITH IPTABLES, SO I CAN CHECK WHETHER MY MOBILE FLAT WOULD BE SUFFICIENT</font>
 # Find Hosts in Subnet
