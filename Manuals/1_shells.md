@@ -1,3 +1,7 @@
+C2 Shell:
+```bash
+export PS1="$PS1\[\e]0;C2\a\]"; cd oscp/lab
+```
 # The cheap way
 
 1. Build payload and launch handler according to https://pentest.ws/tools/venom-builder 
