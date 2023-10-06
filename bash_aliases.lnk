@@ -1,1 +1,75 @@
-/home/kali/.bash_aliases
+# Aliases
+alias connect='sudo openvpn /home/kali/universal.ovpn'
+
+# Resolve Domain-Name with /etc/hosts
+res(){
+	if [[ $1 = 1* ]]
+        then
+		echo $1
+	else
+		echo $(grep -i -m 1 $1 /etc/hosts | cut -f1)
+        fi
+}
+
+# Make proxychains compatible with domainnames
+pc(){
+	# Extract known hostnames from /etc/hosts
+	known_hostnames=$(grep -E "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}" /etc/hosts | cut -f4 | grep -v -E "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
+	# For each argument passed to pc, check if it's a known hostname
+	args="$@"
+	for arg in $args
+	do
+		for known_hostname in $known_hostnames
+		do
+			if [[ "${arg,,}" = "${known_hostname,,}" ]]; then
+				# If it is a known hostname, rewrite it's parameters replacing the hostname with its ip address
+				ip=$(res $arg)
+				args=$(echo "$args" | sed "s/$arg/$ip/g")
+			fi
+		done
+	done
+	proxychains $args
+}
+
+connect-windows(){
+        rdp_uname=${2:-student}
+        rdp_pwd=${3:-lab}
+        parameters='/dynamic-resolution /cert:ignore'
+	
+	# Resolve Hostname if specified
+	rdp_ip=$(res $1)
+
+	# Uses proxychains for connections outside of the 192. address space
+	if [[ $rdp_ip = 192.* ]]
+	then
+		xfreerdp /u:"$rdp_uname" /p:"$rdp_pwd" /v:"$rdp_ip" $parameters &> /dev/null &
+	else
+		echo "-- USING PROXYCHAINS --"
+		proxychains xfreerdp /u:"$rdp_uname" /p:"$rdp_pwd" /v:"$rdp_ip" $parameters &> /dev/null &
+	fi
+}
+
+connect-linux(){
+        ssh_uname=${2:-learner}
+        ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" "$ssh_uname"@"$1"
+}
+
+alias sp="/home/kali/Documents/exploits/searchsploit_custom.sh"
+
+myip=$(ip addr show dev tun0 | grep 'inet ' | cut -d" " -f6 | cut -d"/" -f1)
+#alias script='script -a -f -c "export PS1=\"\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[0;33m\]\$myip\[\033[00m\]:\[\033[01;33m\]\w\[\033[00m\]\$\e]2;.$(pwd | rev | cut -d / -f 1 | rev) script\>
+alias script='script -a -f -c "export PS1=\"${debian_chroot:+($debian_chroot)}\[\e[0;33m\]\u@\$myip\[\e[m\]:\[\e[01;33m\]\w\[\e[m\]\$\[\e]0;$(pwd | rev | cut -d / -f 1 | rev)\a\]\";/bin/bash --norc"'
+#alias script='/bin/bash --norc ' # --rcfile ~/.bash_aliases'
+# Variables
+export GITROB_ACCESS_TOKEN=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
+# export PATH=$PATH:/home/kali/.local/bin
+
+# Setup pyenv https://www.kali.org/docs/general-use/using-eol-python-versions/
+export PYENV_ROOT="$HOME/.pyenv" 
+export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="$PATH:/home/kali/.local/bin" 
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
+
+# Run scripts
+#/home/kali/checkLabConnectivity.s
