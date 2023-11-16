@@ -19,7 +19,7 @@ select * from sqlite_master where type = 'table'
 ```
 ### Postgres
 ```
-SELECT distinct table_name FROM information_schema.columns
+SELECT distinct table_name FROM information_schema.tables
 ```
 
 
