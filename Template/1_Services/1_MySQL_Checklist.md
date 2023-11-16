@@ -13,6 +13,10 @@ mysql -u root -p -h $hip
 ```
 SELECT * FROM information_schema.columns where table_schema=database()
 ```
+### SQLite
+```
+select * from sqlite_master where type = 'table'
+```
 
 
 # Findings
