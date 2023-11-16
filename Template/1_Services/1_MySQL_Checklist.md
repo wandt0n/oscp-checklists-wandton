@@ -17,6 +17,10 @@ SELECT * FROM information_schema.columns where table_schema=database()
 ```
 select * from sqlite_master where type = 'table'
 ```
+### Postgres
+```
+SELECT distinct table_name FROM information_schema.columns
+```
 
 
 # Findings
