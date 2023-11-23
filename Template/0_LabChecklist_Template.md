@@ -51,12 +51,12 @@ sudo nbtscan -r $subnet0/24
 ##### Create working dirs and start individual system scanning
 
 ```bash
-for i in $(tail -n 4 0_Hosts); do (mkdir -p "A_$i" && cd $_ && sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -sUV --top-ports 100 $i -oN 0_udp_top100.txt)& done
+for i in $(tail -n 4 0_Hosts | cut -f4 ); do (mkdir -p "$i" && cd $_ && nmap -Pn --top-ports 30 $i && sudo nmap -Pn --osscan-guess -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -Pn -sUV --top-ports 100 $i -oN 0_udp_top100.txt)& done
 ```
 
 For single host:
 ```bash
-i="";sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -T 5 -sUV --top-ports 100 $i -oN 0_udp_top100.txt
+i="";sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -T 4 -sUV --top-ports 100 $i -oN 0_udp_top100.txt
 ```
 
 ---

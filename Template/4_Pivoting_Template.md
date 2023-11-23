@@ -96,6 +96,10 @@ Start SSH Agent on windows
 `Get-Service ssh-agent | Select StartType` says disabled
 --> `Get-Service -Name ssh-agent | Set-Service -StartupType Manual ; Start-Service ssh-agent`
 
+Warning: remote port forwarding failed for listen port 9997
+(After a previous session was killed, e.g. by a machine revert)
+![[Pasted image 20231006140936.png]]
+
 Correct ssh-key permissions on windows
 ```powershell
 New-Variable -Name Key -Value "C:\Users\Public\id_rsa_kali"
