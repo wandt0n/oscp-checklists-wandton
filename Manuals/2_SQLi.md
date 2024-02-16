@@ -134,4 +134,4 @@ Safe, but `is_numeric(0x414141) = true` !
 ##### addslashes
 escapes special chars with slashes. Safe, if database and php use the same charset!
 `addslashes(x%bf%27 UNION SELECT)= x%bf\' UNION SELECT`
--> PHP sees this as escaped, but the database might read `x%bf%27` as special asian character and then read it as `special_char' UNION SELECT`
+-> PHP sees this as escaped, but the database might read `x%bf%27` as special asian character and then read it as `special_char' UNION SELECT` See https://shiflett.org/blog/2006/addslashes-versus-mysql-real-escape-string
