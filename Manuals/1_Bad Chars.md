@@ -31,3 +31,5 @@ Also: Useful webencoded chars:
 - `%3E` == `<`
 - `%26` == `&`
 - `%7C` == `|`
+
+Unicode spaces: https://www.jkorpela.fi/chars/spaces.html
