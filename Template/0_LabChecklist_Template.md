@@ -5,7 +5,7 @@ await tp.file.rename(filename)
 -%>
 #show
 
-1. Clean the `/etc/hosts` file and link it with `ln -s /etc/hosts ./0_Hosts`
+1. Clean the `/etc/hosts` file and link it with `ln /etc/hosts ./0_Hosts`
 2. Update Searchsploit with `searchsploit -u`
 3. Update Windows Exploit suggester with `wes --update`
 4. Remove neo4j db with `sudo rm -rf /etc/neo4j/data/*`
