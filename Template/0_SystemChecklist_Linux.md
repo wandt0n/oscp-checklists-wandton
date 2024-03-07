@@ -72,3 +72,4 @@ wget -q https://github.com/DominicBreuker/pspy/releases/download/v1.2.1/pspy32 &
 ```
 
 ##### Finding 1
+/root/proof.txt
