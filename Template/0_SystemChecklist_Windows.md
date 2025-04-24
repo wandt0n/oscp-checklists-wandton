@@ -10,6 +10,9 @@ First flag: ☑️
 Second flag: ✅
 
 # Enumeration
+```bash
+i="";sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -T 4 -sUV --top-ports 100 $i -oN 0_udp_top100.txt
+```
 ##### MSRPC (135, 593)
 ```bash
 impacket-rpcdump $hip | grep '12345778-1234-abcd-ef00-0123456789ab\|3919286a-b10c-11d0-9ba8-00c04fd92ef5\|12345778-1234-abcd-ef00-0123456789ac\|1ff70682-0a51-30e8-076d-740be8cee98b\|338cd001-2244-31f1-aaaa-900038001003\|367abb81-9844-35f1-ad32-98f038001003\|4b324fc8-1670-01d3-1278-5a47bf6ee188\|4d9f4ab8-7d1c-11cf-861e-0020af6e7c57'

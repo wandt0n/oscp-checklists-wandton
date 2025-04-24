@@ -9,7 +9,9 @@ tR += "Part of " + "[" + "[" + "0_Lab_" + path[path.length - 2] + "]]";
 First flag: ☑️
 Second flag: ✅
 # Initial Foothold
-
+```bash
+i="";sudo nmap --osscan-guess -T 5 -A -p- $i -oX - | xsltproc -o 0_overview.html - && firefox 0_overview.html && sudo nmap -T 4 -sUV --top-ports 100 $i -oN 0_udp_top100.txt
+```
 ### Software Versions
 
 	 `searchsploit` and Google Dorks
