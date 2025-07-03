@@ -69,3 +69,7 @@ find / -name "configuration.php" -o -name "diagnostics.php" -o -name "joomla.inc
 ```
 
 
+# Git
+Dump: `/GitTools/Dumper/gitdumper.sh http://192.168.1.33:8080/.git/ git`
+Extract: `/GitTools/Extractor/extractor.sh git retrieved`
+

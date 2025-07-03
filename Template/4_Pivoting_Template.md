@@ -26,6 +26,10 @@ ssh -N -D 0.0.0.0:9997 $user_B@$ip_B
 ```
 (Machine A)
 
+```PS
+netsh interface portproxy add v4tov4 listenport=2222 listenaddress=192.168.50.64 connectport=22 connectaddress=10.4.50.215
+```
+
 ### Remote Dynamic with ProxyChains and SSH
 > Requires SSH above 7.6. Check with `ssh -V`.
 ##### 1st Setup (kali machine)
