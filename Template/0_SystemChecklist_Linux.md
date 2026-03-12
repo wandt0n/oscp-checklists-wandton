@@ -52,7 +52,15 @@ echo -e "\n## KEYS: ##"; ls /home/*/.gpg/; ls /home/*/.ssh/; echo -e "\n## HISTO
 ```bash
 ls -al /home/*/; ls -al /root/; find / -user $(id -un) -type f 2>/dev/null | grep -Ev "^/sys|^/run|^/proc"
 ```
-	
+
+Compare Home Folder with users
+```bash
+cd /tmp/
+awk -F: '{print $6}' /etc/passwd | sort -u > 1
+ls -1d /home/* | sort -u > 2
+diff -U0 1 2 | grep '^+'
+diff -U0 1 2 | grep '^-'
+```
 # PrivEsc
 Find Working Dir for attack
 ```bash

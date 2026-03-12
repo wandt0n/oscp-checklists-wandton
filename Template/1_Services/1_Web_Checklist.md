@@ -4,21 +4,44 @@
 ## Start Enum
 ```bash
 export target="http://192.168./"; \
-for site in {"robots.txt","crossdomain.xml","clientaccesspolicy.xml","sitemap.xml",".well-known/"}; do chromium "$target$site" &> /dev/null & done && \
+for site in {"robots.txt","crossdomain.xml","clientaccesspolicy.xml","sitemap.xml",".well-known/", "security.txt", "humans.txt"}; do chromium "$target$site" &> /dev/null & done && \
 whatweb -v -a 3 $target | tee -a webeval.txt && \
 dirb $target -S | tee -a webeval.txt && \
 nikto -maxtime=60s -host=$target | tee -a webeval.txt && \
 cmsmap -F -d $target | tee -a webeval.txt
 ```
-AUSPROBIEREN: `skipfish -o skipfish.txt $target`
-Alternative for Dir Spidering:
-`gobuster dir -w /usr/share/wordlists/dirb/common.txt -u $target -x php,html,htm,txt,pdf,config -k | tee gobuster.txt`
+
+For robots.txt analysis: https://www.google.com/webmasters/tools
+If .well-known is not listable: [here on WikiPedia](https://en.wikipedia.org/wiki/List_of_/.well-known/_services_offered_by_webservers) or [here via IANA](https://www.iana.org/assignments/well-known-uris/well-known-uris.xhtml)
+
+To find apps on **other subdomains**: 
+`gobuster dns -do example.com -w /path/to/wordlist.txt` 
+
+To find apps on **other virtual hosts**: 
+- `gobuster vhost -u https://example.com -w /path/to/wordlist.txt`
+	- Alternatives: `amass`, `subfinder`, `dnsrecon`, and `fierce`
+- Certificate Transparency Logs like https://crt.sh/
+- Public DNS records (A, AAAA, MX, TXT, NS) like with nslookup, dig, and host
+	- Reverse DNS lookup (PTR record, does not always work)
+- Public Databases like [Netcraft Search DNS](https://searchdns.netcraft.com/?host)
+- Reverse IP Services like [MxToolbox Reverse IP](https://mxtoolbox.com/ReverseLookup.aspx)
+- Zone transfer
+
+To find apps on **other ports**, do not forget nmap scan
+##### Alternatives
+Manual alternatives: 
+- HTTP response headers of malformed HTTP requests (e.g. invalid Method) -> Does not work with some reverse proxies
+- Look for `<meta>` tags in website source. Should be independent of the path
+- Google search with `site: target.com`
+
+Alternative für nikto: `skipfish -o skipfish.txt $target`
+Alternative for Dir Spidering: `gobuster dir -w /usr/share/wordlists/dirb/common.txt -u $target -x php,html,htm,txt,pdf,config -k | tee gobuster.txt`
 
 Alternatives for CMS checking:
 - `cmseek -u $hip`
 - `pyver=$(pyenv global) && pyenv global 2.7 && python ~/Documents/activeInformationGathering/clusterd/clusterd.py -i $hip --fingerprint && pyenv global $pyver`
 
-
+Continue on https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/05-Review_Web_Page_Content_for_Information_Leakage
 ### SQL Injections
 AUSPROBIEREN: wfuzz
 
