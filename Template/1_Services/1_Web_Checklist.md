@@ -71,9 +71,23 @@ Alternatives for CMS checking:
 #### Microservices
 Usage of multipe languages
 #### Cloud Storage
-`BUCKET.s3.amazonaws.com` or `s3.REGION.amazonaws.com/BUCKET` (Amazon S3)
-`ACCOUNT.blob.core.windows.net` (Azure Storage)
-Also see [Testing Cloud Storage Guide](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/11-Test_Cloud_Storage)
+##### AWS
+Identify:
+	**Virtual Host Style Access**
+	`https://BUCKET.s3.REGION.amazonaws.com/KEY`For example:
+	`https://example-bucket.s3.us-west-2.amazonaws.com/puppy.png`
+	In some regions, the legacy global endpoint (without a region) can be used: `BUCKET.s3.amazonaws.com` 
+	**Path-Style Access**
+	`https://s3.REGION.amazonaws.com/BUCKET/KEY`
+	In some regions, the legacy global endpoint (without a region) can be used: `s3.amazonaws.com/BUCKET`
+
+**Test with AWS CLI**
+List objects: `aws s3 ls s3://<bucket-name>`
+Upload: `aws s3 cp arbitrary-file s3://bucket-name/path-to-save`
+Remove: `aws s3 rm s3://bucket-name/object-to-remove`
+##### Azure
+Identify:
+	`ACCOUNT.blob.core.windows.net`
 #### Third Party Services and APIs
 - [Active content](https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content#mixed_active_content) (such as scripts, style sheets, fonts, and iframes)
 - [Passive content](https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content#mixed_passivedisplay_content) (such as images and videos)
@@ -98,12 +112,57 @@ Identify backend systems:
 - DNS grinding, zone transfers or certificate transparency lists for a domain may reveal it on a subdomain
 - Scan IP ranges used by company
 - Use SSRF or error messages to reveal IP address
+##### DNS
+`A`, `CNAME`, `MX`, `TXT`, and especially `NS` pointing to a target that can be registered by the attacker can lead to subdomain takeover
+When querying with `dig`, look for `NXDOMAIN`, `SERVFAIL`, `REFUSED`, and `no servers could be reached`. These indicate invalid configurations
 #### Authentication
 ##### Basic Auth
 `WWW-Authenticate: Basic` HTTP header
 ##### .htaccess files
 ##### Application specific
 Stored in DB and requested via API
+- Can we distinguish whether the user is non-existent or the password is wrong?
+- Do default or test credentials work?
+- Is a password policy enforced and sufficient?
+- Can they be easily bruteforced? #whitebox 
+- If "Remember Me" option is available: Does that reflect user's password?
+- Does a password change require re-authentication? If not, CSRFing it might be possible
+- Can we bypass Authentication?
+	- Access functionality directly
+	- Predict Session ID
+	- Manipulate password check through SLQi
+	- If compared in php with `==`, not `===`: Is the password `1` or `true` accepted?
+**Lock-out mechanisms**
+Should be used and sufficient
+AWS's Cognito is difficult to detect. To test for it:
+	To test for this using a fuzzing tool, such as Burp Suite’s Intruder, navigate into the “Resource Pool”. Then set the maximum concurrent requests to 1 and the delay between requests to 2 seconds. Attempt the invalid authentication 200 times, then attempt to use the valid credentials 3 times directly after the fuzzing tool finishes. Wait 2 minutes and attempt to sign-in. If sign-in is then successful, Cognito may be in use. Further testing can then be performed to validate the use of Cognito by attempting to push the lockout time higher, but it may be easier to validate this information with the client.
+Can an unlock mechanism be triggered?
+**Forgot password method**
+- Is it different in the API or mobile app? 
+- Does it bypass MFA?
+- Are sufficient rate-limitings or lock-out mechanisms in place?
+- Can the used identifiers (e.g. email) be changed without requiring re-authentication? If so, the re-auth on password change can be bypassed
+- Is the user informed if their password is changed?
+- Vulnerabilities in sending mail/sms/..
+	- Exposure of information about the backend
+	- Open Relay attacks, e.g., to drive up costs for the business
+*Reset Links*
+- Are they generated using the Host header? -> Host header injection to steal token
+- Do they expire after time and after use?
+- Does the target site embedd third-party sites -> If `Referrer-Policy` is not set, `Referrer` header might expose token to these third-parties
+- Can the token be guessed? Can it be used to reset a different user's password?
+MFA mechanisms should be tested in a similar fashion
+**CAPTCHAs**
+Should not replace lock-out mechanisms. Common weaknesses are:
+- Easily defeated challenge, such as arithmetic or limited question set
+- Solution to the captcha is contained in alt-text of image, filenames, or a hidden field
+- captcha server-side logic does
+	- not check for solve or defaults to a successful solve
+	- check for HTTP response code instead of response success
+	- only check for correct answer, not if it matches to the actual question
+- captcha input field or parameter is improperly validated or escaped
+- captcha is not asked for when clearing the cookies (e.g. if only shown on multiple wrong attempts) or when using the corresponding API
+
 ##### Central Authentication
 May use NTLM: `WWW-Authenticate: NTLM` HTTP header
 Or hints that the users domain is relevant for auth
@@ -116,6 +175,12 @@ Options are:
 - Plain text config files, as with Apache
 - OS GUI tools, as with Microsoft IIS or ASP.Net
 Files can be transfered through FTP servers, WebDAV, network file systems (NFS, CIFS)
+#blackbox To identify the used option:
+- [Google Dorks](https://www.exploit-db.com/google-hacking-database)
+- Comments and Links in User-accessible site code
+- Application Documentation
+- Nmap
+#whitebox Is admin functionality accessible when opening the correct urls or contacting the correct endpoints directly?
 ### Database
 Portscanning or triggering SQLi
 - Windows, IIS and ASP.NET often use Microsoft SQL server
@@ -124,7 +189,49 @@ Portscanning or triggering SQLi
 - APEX often uses Oracle
 #### SQL Injections
 AUSPROBIEREN: wfuzz
+### Web Frameworks
+#### PHP
+**Admin Pages**
+```
+/phpinfo
+/phpmyadmin/
+/phpMyAdmin/
+/mysqladmin/
+/MySQLadmin
+/MySQLAdmin
+/login.php
+/logon.php
+/xmlrpc.php
+/dbadmin
+```
+#### Tomcat
+**Admin Pages**
+```
+/manager/html
+/host-manager/html
+/manager/text
+/tomcat-users.xml
+```
+##### Apache
+**Admin Pages**
+```
+/index.html
+/httpd.conf
+/apache2.conf
+/server-status
+```
 
+#### Nginx
+**Admin Pages**
+```
+/index.html
+/index.htm
+/index.php
+/nginx_status
+/index.php
+/nginx.conf
+/html/error
+```
 ### CMS
 #### Wordpress
 ```bash
@@ -132,6 +239,16 @@ wpscan --update --url "https://$hip:80" --detection-mode aggressive --plugins-de
 ```
 **RCE Wordpress**
 Upload an new plugin, just containing your shell.php. Then, go to media center, grap the path to that file and access it. 
+**Admin Pages**
+```
+wp-admin/
+wp-admin/about.php
+wp-admin/admin-ajax.php
+wp-admin/admin-db.php
+wp-admin/admin-footer.php
+wp-admin/admin-functions.php
+wp-admin/admin-header.php
+```
 **Loot Wordpress**
 ```bash
 find / -name "setup-config.php" -o -name "wp-config.php"
@@ -163,6 +280,16 @@ Exploit: Login as Admin -> Modules -> Enable PHP Filter (Might need to enable it
 ```bash
 ./joomlascan.py $hip
 ```
+**Admin Pages**
+```
+/administrator/index.php
+/administrator/index.php?option=com_login
+/administrator/index.php?option=com_content
+/administrator/index.php?option=com_users
+/administrator/index.php?option=com_menus
+/administrator/index.php?option=com_installer
+/administrator/index.php?option=com_config
+```
 **Loot Joomla**
 ```bash
 find / -name "configuration.php" -o -name "diagnostics.php" -o -name "joomla.inc.php" -o -name "config.inc.php"
@@ -170,6 +297,146 @@ find / -name "configuration.php" -o -name "diagnostics.php" -o -name "joomla.inc
 ### Git
 Dump: `/GitTools/Dumper/gitdumper.sh http://192.168.1.33:8080/.git/ git`
 Extract: `/GitTools/Extractor/extractor.sh git retrieved`
+
+## Web Logic
+### Paths
+https://filext.com/
+#### Download
+What kind of file extensions can I download?
+How are their permissions set?
+- File permissions may be part of EXIF data of files that can be accessed
+#whitebox Are any backup files or archives accessible?
+Can I circumvent checks abusing the Windows 8.3 legacy filename handling?
+	DOS allowed max. 8 chars + optionally max. 3 chars extension. Chars must be ASCII (<0x80) and not contain more than one `.`. 
+	Modern Windows generates shorthand file names for compatibility by:
+	- Using up to the first six chars of the basename, appended by `~1`
+	- If present, using up to the first three chars of the file extension
+	- Removing incompatible characters and replacing spaces with underscores
+	- Making all characters upper-case.
+	For example:
+	- `file.phtml` -> `FILE~1.PHT`
+	- `secretfile.txt` -> `SECRET~1.txt`
+	- `two.txt` -> `TWO~1.txt`
+	- `filenamewithoutextension` -> `FILENA~1` or `FILENA~1.` (equivalent)
+#### Upload
+What kind of file extensions can I upload?
+Does the app logic change file extensions of uploaded files? -> Polyglots?
+Are magic bytes checked to verify that the file extension is correct for a given file?
+#### Caching Confusion
+Responses to paths with user-specific data usually contain do-not-cache headers.
+Do the following URIs resolve to `https://example.com/home`?
+- `https:// example.com/home`
+- `https://example.com/home/nonexistant.css`
+Then, we might lure a victim to one of these URIs, which will likely cache his personal data and make it available to us on this same URI.
+#whitebox Is caching dependant on some Regex or file extensions, instead of the set do-not-cache headers?
+### HTTP Methods
+To list supported methods:
+```http
+OPTIONS / HTTP/1.1
+Host: example.org
+```
+Or just try them out. `405 Method Not Allowed` should be returned for non-supported methods.
+```
+curl -X FOO https://example.org
+```
+Possible WAF bypass: Unknown methods may be treated like GET.
+If a method, e.g., DELETE, is not allowed, test whether the following HTTP Headers can change the 405 to a 200:
+- `X-HTTP-Method: DELETE`
+- `X-HTTP-Method-Override: DELETE`
+- `X-Method-Override: DELETE`
+#### PUT
+```http
+PUT /test.html HTTP/1.1
+Host: example.org
+Content-Length: 25
+
+testfilePUTupload
+```
+#### CONNECT
+```http
+CONNECT 192.168.0.1:443 HTTP/1.1
+Host: example.org
+```
+
+### HTTP Headers
+[Mozilla HTTP Headers Doku](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers)
+#### Strict Transport Security (STS)
+Tells browser to always use TLS. Should be present.
+Identify:
+`Strict-Transport-Security:` response header
+- `max-age=1223;`: no. of seconds that this policy must be enforced from now
+- `includeSubDomains;`: All related sub-domains must be accessed with HTTPS too
+- `preload;` (Unofficial): Domains are on the [preload lists](https://hstspreload.org/). Browsers should never connect without HTTPS
+Only effective if delivered over HTTPS; Ineffective if delivered over HTTP
+#### Content Security Policy (CSP)
+Restricts sources from which JavaScript, CSS, images, files etc. can be loaded. Should be present and configured well.
+Identfiy
+`Content-Security-Policy:` response header or equivalent `<meta>` element.
+Misconfigurations:
+	General:
+	- `Content-Security-Policy-Report-Only` -> Does not enforce CSP
+	- Missing `object-src 'none'`, `base-uri 'none'`, or `frame-ancestors`
+	- `unsafe-inline`, `-eval`
+	- Absence or misuse of `frame-ancestors` -> Clickjacking (if not X-Frame-Options DENY or SAMEORIGIN)
+	- Missing `object-src`, `base-uri`, or restrictive `default-src`
+	- Duplicate directives or conflicting policy definitions -> Unintended enforcement behavior possible
+	- Do sources host JSONP endpoints (e.g. called with `?jsonp=` or `?callback=`) or user-controlled content
+		Especially if sources use (partial-)wildcards
+	If CSP is delivered via `<meta>` element, check that
+	- `frame-ancestors`, `report-uri`, `report-to`, or `sandbox` are not used (not supported in meta tag definition)
+	If `unsafe-hashes` or nonces are used, check that:
+	- Hashes are not predictable and improperly scoped
+	- Nonces are cryptographically random, never reused, and regenerated per response
+	- If `strict-dynamic` is used, check that:
+		- no trust chain allows attacker-controlled script loading (trust propagates from nonce- or hash-based scripts)
+	If `report-uri` or `report-to` is configured, check that:
+	- reporting endpoints are reachable and functional
+	- reports do not expose sensitive information
+	- reports do not introduce injection or DoS vectors 
+	If target is high-risk application: 
+	- Absence or lax usage of `require-trusted-types-for` and `trusted-types` -> DOM-based injection sinks
+	
+Easy eval: https://csp-evaluator.withgoogle.com/
+#### Hop-By-Hop Headers
+Not meant to be forwarded. Intended to be used in only the next hop (client<->proxy, proxy<->proxy, ...).  [RFC 2616](https://tools.ietf.org/html/rfc2616#section-13.5.1). 
+Specific headers: `Keep-Alive`, `Transfer-Encoding`, `TE`, `Connection`, `Trailer`, `Upgrade`, `Proxy-Authorization`, and `Proxy-Authenticate`
+
+Additional headers can be designated as hop-by-hop via the `Connection` header!
+**IP Spoofing**
+```http
+GET / HTTP/1.1
+Host: example.org
+X-Forwarded-For: <fake-ip-address>
+Connection: close, X-Forwarded-For
+```
+-> Misconfigured proxy might strip the X-Forwarded-For header and not include its own -> Web app thinks request comes from proxy itself or fake ip-address
+**Cache Poisioning**
+Setting the `Cookie` header as hop-by-hop may cause the response to be cached -> users get this cached version instead of the one tailored for their cookie
+**Removing Security Headers**
+```http
+GET /api/user/profile HTTP/1.1
+Host: example.com
+X-Authenticated-User: victim_user
+Connection: close, X-Authenticated-User
+```
+Could bypass IP-based ACLs, Identity/Authentication checks performed at the edge or disable security features enforced by intermediary headers
+#### Deprecated Headers
+- HTTP Public Key Pinning (HPKP)
+- X-Frame-Options: ALLOW-FROM
+
+## Browser Features
+### Caching
+Responses that contain sensitive information should use HTTPS and  include a `Cache-Control: no-store` header
+Can be tested by logging out and pressing the browser's back button. It should not reveal the sensitive information
+Further info: about:cache (Firefox)
+
+
+
+Continue with https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/README
+Continue with HT PENTESTING WEB (https://hacktricks.wiki/en/pentesting-web/abusing-hop-by-hop-headers.html)
+
+
+
 ## Results
 ### App Logic
 Note down interesting facts about different paths for later evaluation. Including:
@@ -203,7 +470,7 @@ Default credentials?
 | CMS       |         |         |            |                   |
 |           |         |         |            |                   |
 
-### Grey-Box Testing
+### White-Box Testing
 Do [[#Best-Practice Guides]] exist for the used technologies? Are they followed?
 
 #### Logging
