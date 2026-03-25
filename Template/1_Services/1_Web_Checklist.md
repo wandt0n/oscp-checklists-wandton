@@ -168,6 +168,20 @@ May use NTLM: `WWW-Authenticate: NTLM` HTTP header
 Or hints that the users domain is relevant for auth
 ##### SSO
 OAuth, OpenID Connect, or SAML
+
+#### Authorization
+Autorize BurpSuite Addon
+Horizonal Access (Modify or View Content of different user of the same role/group)
+Vertical Access (Forced Browsing)
+Special Request Headers:
+```http
+GET / HTTP/1.1
+Host: www.example.com
+X-Original-URL: /donotexist1
+```
+And the same with `X-Rewrite-URL`. Does this lead to an 404, although `/` without these headers does not? -> Bypass Authorization through rewrite headers
+Imitating local access:
+`X-Forwarded-For`, `X-Forward-For`, `X-Remote-IP`, `X-Originating-IP`, `X-Remote-Addr`, `X-Client-IP` with `127.0.0.1:43982` or `169.254.0.5`
 ### Administration
 Options are:
 - Additional Webapp, as with iPlanet web server
@@ -305,6 +319,7 @@ https://filext.com/
 What kind of file extensions can I download?
 How are their permissions set?
 - File permissions may be part of EXIF data of files that can be accessed
+[Path Traversal](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Directory%20Traversal) 
 #whitebox Are any backup files or archives accessible?
 Can I circumvent checks abusing the Windows 8.3 legacy filename handling?
 	DOS allowed max. 8 chars + optionally max. 3 chars extension. Chars must be ASCII (<0x80) and not contain more than one `.`. 
@@ -322,6 +337,7 @@ Can I circumvent checks abusing the Windows 8.3 legacy filename handling?
 What kind of file extensions can I upload?
 Does the app logic change file extensions of uploaded files? -> Polyglots?
 Are magic bytes checked to verify that the file extension is correct for a given file?
+[Path Traversal](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Directory%20Traversal) / [LFI / RFI](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/File%20Inclusion)?
 #### Caching Confusion
 Responses to paths with user-specific data usually contain do-not-cache headers.
 Do the following URIs resolve to `https://example.com/home`?
@@ -432,7 +448,7 @@ Further info: about:cache (Firefox)
 
 
 
-Continue with https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/README
+Continue with https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/03-Testing_for_Privilege_Escalation
 Continue with HT PENTESTING WEB (https://hacktricks.wiki/en/pentesting-web/abusing-hop-by-hop-headers.html)
 
 
