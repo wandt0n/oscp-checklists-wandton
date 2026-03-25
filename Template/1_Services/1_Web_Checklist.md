@@ -55,7 +55,7 @@ Manual alternatives:
 
 Alternative für nikto: `skipfish -o skipfish.txt $target`
 Alternative for Dir Spidering: `gobuster dir -w /usr/share/wordlists/dirb/common.txt -u $target -x php,html,htm,txt,pdf,config -k | tee gobuster.txt`
-Alternative for whatweb: [[8_Web_Identifiers]] or [Wappalyzer]([https://www.wappalyzer.com/](https://www.wappalyzer.com/))
+Alternative for whatweb: [[8_Web_framework_identifiers]] or [Wappalyzer]([https://www.wappalyzer.com/](https://www.wappalyzer.com/))
 
 Alternatives for CMS checking:
 - `cmseek -u $hip`
