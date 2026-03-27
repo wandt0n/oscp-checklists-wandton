@@ -55,7 +55,7 @@ Manual alternatives:
 
 Alternative für nikto: `skipfish -o skipfish.txt $target`
 Alternative for Dir Spidering: `gobuster dir -w /usr/share/wordlists/dirb/common.txt -u $target -x php,html,htm,txt,pdf,config -k | tee gobuster.txt`
-Alternative for whatweb: [[8_Web_framework_identifiers]] or [Wappalyzer]([https://www.wappalyzer.com/](https://www.wappalyzer.com/))
+Alternative for whatweb: [[9_web_framework_identifiers]] or [Wappalyzer]([https://www.wappalyzer.com/](https://www.wappalyzer.com/))
 
 Alternatives for CMS checking:
 - `cmseek -u $hip`
@@ -69,7 +69,9 @@ Alternatives for CMS checking:
 #### Serverless
 `X-Amz-Invocation-Type` HTTP header (AWS) or usage of Kestrel (Azure)
 #### Microservices
-Usage of multipe languages
+Identify:
+- Usage of multipe languages
+- Error messages!
 #### Cloud Storage
 ##### AWS
 Identify:
@@ -95,93 +97,38 @@ Identify:
 - Social media buttons
 - Advertising networks
 - Payment gateways
-#### Network Components
-##### Reverse Proxy
+### Web Servers
+Try to break the HTTP RFC, see whether this reveals info through error messages.
+#### Caching
+Responses that contain sensitive information should use HTTPS and  include a `Cache-Control: no-store` header
+Can be tested by logging out and pressing the browser's back button. It should not reveal the sensitive information
+Further info: about:cache (Firefox)
+#### TLS
+[KnowledgeBase - TLS](obsidian://open?vault=KnowledgeBase&file=03%20-%20Content%2F08%20-%20Courses%2F08%20-%20TLS)
+- Subject Alternate Name (SAN) should match the system hostname
+- Automate testing with nmap, sslscan, or sslyze
+
+### Network Components
+#### Reverse Proxy
 Detect:
 - Mismatch between HTTP Server header and the actual backend application -> Request Smuggling
 - Multiple Server (or other) headers
 - Multiple applications hosted on the same IP address or domain (especially if they use different languages)
-##### Load Balancer
+#### Load Balancer
 Detect by making multiple requests and look for differences in system times, IPs or hostnames in error messages or SSRF attack
 F5 BIG-IP load balancers ->  `BIGipServer` cookie
 
-##### Content Delivery Network (CDN)
+#### Content Delivery Network (CDN)
 Cloudflare, Akamai, Fastly, [...](https://en.wikipedia.org/wiki/Content_delivery_network#Notable_content_delivery_service_providers)
 Identify backend systems:
 - If webapp can send emails, e.g., "forgot password", use feature and check source of mail
 - DNS grinding, zone transfers or certificate transparency lists for a domain may reveal it on a subdomain
 - Scan IP ranges used by company
 - Use SSRF or error messages to reveal IP address
-##### DNS
+#### DNS
 `A`, `CNAME`, `MX`, `TXT`, and especially `NS` pointing to a target that can be registered by the attacker can lead to subdomain takeover
 When querying with `dig`, look for `NXDOMAIN`, `SERVFAIL`, `REFUSED`, and `no servers could be reached`. These indicate invalid configurations
-#### Authentication
-##### Basic Auth
-`WWW-Authenticate: Basic` HTTP header
-##### .htaccess files
-##### Application specific
-Stored in DB and requested via API
-- Can we distinguish whether the user is non-existent or the password is wrong?
-- Do default or test credentials work?
-- Is a password policy enforced and sufficient?
-- Can they be easily bruteforced? #whitebox 
-- If "Remember Me" option is available: Does that reflect user's password?
-- Does a password change require re-authentication? If not, CSRFing it might be possible
-- Can we bypass Authentication?
-	- Access functionality directly
-	- Predict Session ID
-	- Manipulate password check through SLQi
-	- If compared in php with `==`, not `===`: Is the password `1` or `true` accepted?
-**Lock-out mechanisms**
-Should be used and sufficient
-AWS's Cognito is difficult to detect. To test for it:
-	To test for this using a fuzzing tool, such as Burp Suite’s Intruder, navigate into the “Resource Pool”. Then set the maximum concurrent requests to 1 and the delay between requests to 2 seconds. Attempt the invalid authentication 200 times, then attempt to use the valid credentials 3 times directly after the fuzzing tool finishes. Wait 2 minutes and attempt to sign-in. If sign-in is then successful, Cognito may be in use. Further testing can then be performed to validate the use of Cognito by attempting to push the lockout time higher, but it may be easier to validate this information with the client.
-Can an unlock mechanism be triggered?
-**Forgot password method**
-- Is it different in the API or mobile app? 
-- Does it bypass MFA?
-- Are sufficient rate-limitings or lock-out mechanisms in place?
-- Can the used identifiers (e.g. email) be changed without requiring re-authentication? If so, the re-auth on password change can be bypassed
-- Is the user informed if their password is changed?
-- Vulnerabilities in sending mail/sms/..
-	- Exposure of information about the backend
-	- Open Relay attacks, e.g., to drive up costs for the business
-*Reset Links*
-- Are they generated using the Host header? -> Host header injection to steal token
-- Do they expire after time and after use?
-- Does the target site embedd third-party sites -> If `Referrer-Policy` is not set, `Referrer` header might expose token to these third-parties
-- Can the token be guessed? Can it be used to reset a different user's password?
-MFA mechanisms should be tested in a similar fashion
-**CAPTCHAs**
-Should not replace lock-out mechanisms. Common weaknesses are:
-- Easily defeated challenge, such as arithmetic or limited question set
-- Solution to the captcha is contained in alt-text of image, filenames, or a hidden field
-- captcha server-side logic does
-	- not check for solve or defaults to a successful solve
-	- check for HTTP response code instead of response success
-	- only check for correct answer, not if it matches to the actual question
-- captcha input field or parameter is improperly validated or escaped
-- captcha is not asked for when clearing the cookies (e.g. if only shown on multiple wrong attempts) or when using the corresponding API
 
-##### Central Authentication
-May use NTLM: `WWW-Authenticate: NTLM` HTTP header
-Or hints that the users domain is relevant for auth
-##### SSO
-OAuth, OpenID Connect, or SAML
-
-#### Authorization
-Autorize BurpSuite Addon
-Horizonal Access (Modify or View Content of different user of the same role/group)
-Vertical Access (Forced Browsing)
-Special Request Headers:
-```http
-GET / HTTP/1.1
-Host: www.example.com
-X-Original-URL: /donotexist1
-```
-And the same with `X-Rewrite-URL`. Does this lead to an 404, although `/` without these headers does not? -> Bypass Authorization through rewrite headers
-Imitating local access:
-`X-Forwarded-For`, `X-Forward-For`, `X-Remote-IP`, `X-Originating-IP`, `X-Remote-Addr`, `X-Client-IP` with `127.0.0.1:43982` or `169.254.0.5`
 ### Administration
 Options are:
 - Additional Webapp, as with iPlanet web server
@@ -195,6 +142,7 @@ Files can be transfered through FTP servers, WebDAV, network file systems (NFS, 
 - Application Documentation
 - Nmap
 #whitebox Is admin functionality accessible when opening the correct urls or contacting the correct endpoints directly?
+Also see [[9_admin_pages#List of Admin Pages|List of Admin Pages]]
 ### Database
 Portscanning or triggering SQLi
 - Windows, IIS and ASP.NET often use Microsoft SQL server
@@ -203,49 +151,7 @@ Portscanning or triggering SQLi
 - APEX often uses Oracle
 #### SQL Injections
 AUSPROBIEREN: wfuzz
-### Web Frameworks
-#### PHP
-**Admin Pages**
-```
-/phpinfo
-/phpmyadmin/
-/phpMyAdmin/
-/mysqladmin/
-/MySQLadmin
-/MySQLAdmin
-/login.php
-/logon.php
-/xmlrpc.php
-/dbadmin
-```
-#### Tomcat
-**Admin Pages**
-```
-/manager/html
-/host-manager/html
-/manager/text
-/tomcat-users.xml
-```
-##### Apache
-**Admin Pages**
-```
-/index.html
-/httpd.conf
-/apache2.conf
-/server-status
-```
-
-#### Nginx
-**Admin Pages**
-```
-/index.html
-/index.htm
-/index.php
-/nginx_status
-/index.php
-/nginx.conf
-/html/error
-```
+### Web Servers
 ### CMS
 #### Wordpress
 ```bash
@@ -440,17 +346,94 @@ Could bypass IP-based ACLs, Identity/Authentication checks performed at the edge
 - HTTP Public Key Pinning (HPKP)
 - X-Frame-Options: ALLOW-FROM
 
-## Browser Features
-### Caching
-Responses that contain sensitive information should use HTTPS and  include a `Cache-Control: no-store` header
-Can be tested by logging out and pressing the browser's back button. It should not reveal the sensitive information
-Further info: about:cache (Firefox)
+### Authentication
+#### Basic Auth
+`WWW-Authenticate: Basic` HTTP header
+Ensure that HTTPS is used. Password is cleartext.
+#### .htaccess files
+#### Application specific
+Stored in DB and requested via API
+- Can we distinguish whether the user is non-existent or the password is wrong?
+- Do default or test credentials work?
+- Is a password policy enforced and sufficient?
+- Can they be easily bruteforced? #whitebox 
+- Does a password change require re-authentication? If not, CSRFing it might be possible
+- If password is submitted via form: Does the form action specifies https?
+- Can we bypass Authentication?
+	- Manipulate password check through SLQi
+	- If compared in php with `==`, not `===`: Is the password `1` or `true` accepted?
+**Lock-out and throttling mechanisms**
+Should be used and sufficient
+AWS's Cognito is difficult to detect. To test for it:
+	To test for this using a fuzzing tool, such as Burp Suite’s Intruder, navigate into the “Resource Pool”. Then set the maximum concurrent requests to 1 and the delay between requests to 2 seconds. Attempt the invalid authentication 200 times, then attempt to use the valid credentials 3 times directly after the fuzzing tool finishes. Wait 2 minutes and attempt to sign-in. If sign-in is then successful, Cognito may be in use. Further testing can then be performed to validate the use of Cognito by attempting to push the lockout time higher, but it may be easier to validate this information with the client.
+Can an unlock mechanism be triggered?
+Can we bypass the lock-out mechanism by changing `X-forwarded-For` on every request?
+**Forgot password method**
+- Is it different in the API or mobile app? 
+- Does it bypass MFA?
+- Are sufficient rate-limitings or lock-out mechanisms in place?
+- Can the used identifiers (e.g. email) be changed without requiring re-authentication? If so, the re-auth on password change can be bypassed
+- Is the user informed if their password is changed?
+- Vulnerabilities in sending mail/sms/..
+	- Exposure of information about the backend
+	- Open Relay attacks, e.g., to drive up costs for the business
+*Reset Links*
+- Are they generated using the Host header? -> Host header injection to steal token
+- Do they expire after time and after use?
+- Does the target site embedd third-party sites -> If `Referrer-Policy` is not set, `Referrer` header might expose token to these third-parties
+- Can the token be guessed? Can it be used to reset a different user's password?
+MFA mechanisms should be tested in a similar fashion
+**CAPTCHAs**
+Should not replace lock-out mechanisms. Common weaknesses are:
+- Easily defeated challenge, such as arithmetic or limited question set
+- Solution to the captcha is contained in alt-text of image, filenames, or a hidden field
+- captcha server-side logic does
+	- not check for solve or defaults to a successful solve
+	- check for HTTP response code instead of response success
+	- only check for correct answer, not if it matches to the actual question
+- captcha input field or parameter is improperly validated or escaped
+- captcha is not asked for when clearing the cookies (e.g. if only shown on multiple wrong attempts) or when using the corresponding API
+
+#### Central Authentication
+May use NTLM: `WWW-Authenticate: NTLM` HTTP header
+Or hints that the users domain is relevant for auth
+#### SSO
+OAuth, OpenID Connect, or SAML
+[KnowledgeBase: Single Sign-On](obsidian://open?vault=KnowledgeBase&file=03%20-%20Content%2F08%20-%20Courses%2F03%20-%20Single%20Sign-On)
+If client_secret is leaked, try OAuth Client Credential Flow
+```bash
+curl -X POST -d "grant_type=client_credentials&client_id=00000000-1111-2222-3333-444444444444&client_secret=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&scope=https://graph.microsoft.com/.default" https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token
+```
+Implicit code flows are generally more dangerous
+Bad if leaked: `access_token`, `refresh_token`, `authorization_code`, `code_challenge` with `code_verifier`
+### Authorization
+Autorize BurpSuite Addon
+Horizonal Access (Modify or View Content of different user of the same role/group)
+Vertical Access (Forced Browsing)
+Special Request Headers:
+```http
+GET / HTTP/1.1
+Host: www.example.com
+X-Original-URL: /donotexist1
+```
+And the same with `X-Rewrite-URL`. Does this lead to an 404, although `/` without these headers does not? -> Bypass Authorization through rewrite headers
+Imitating local access:
+`X-Forwarded-For`, `X-Forward-For`, `X-Remote-IP`, `X-Originating-IP`, `X-Remote-Addr`, `X-Client-IP` with `127.0.0.1:43982` or `169.254.0.5`
+Does authorization rely on regex? See [[8_grep_cheatsheet#Web#Regex|grep regex]] #whitebox 
+
+### Session Management
+- If "Remember Me" option is available: Does that reflect user's password?
+- Can we predict the Session ID? If some parts are static: Can we guess it?
+- Are all `Set-Cookie` directives tagged as `Secure`?
+- Is the cookies transported over TLS? Can we change that?
+- Is the expire time reasonable?
+- Do `Cache-Control` settings protect Cookies?
+
+### Generic Inputs
+https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/README #todo
 
 
-
-Continue with https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/03-Testing_for_Privilege_Escalation
-Continue with HT PENTESTING WEB (https://hacktricks.wiki/en/pentesting-web/abusing-hop-by-hop-headers.html)
-
+Continue with https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/README
 
 
 ## Results
@@ -497,8 +480,6 @@ Do [[#Best-Practice Guides]] exist for the used technologies? Are they followed?
 - How are logs reviewed? Can administrators use these reviews to detect targeted attacks?
 - How are log backups preserved?
 - Is the data being logged data validated (min/max length, chars etc) prior to being logged?
-
-CONTINUE HERE: https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/03-Test_File_Extensions_Handling_for_Sensitive_Information
 
 # References
 ## Best-Practice Guides
