@@ -99,6 +99,24 @@ Identify:
 - Social media buttons
 - Advertising networks
 - Payment gateways
+
+#### Browser-based Storage
+Check if:
+- Tokens or session IDs persist after logout
+- Sensitive data is stored in persistent storage without necessity
+**LocalStorage**
+key-value strings, persistent
+**Session Storage**
+key-value strings, ephemeral -> clears when browser tab is closed
+**IndexedDB**
+object-oriented, persistent. Allows to store complex objects like CryptoKeys. If there are, check if they are set as `extractable: true`
+**WebSQL**
+Deprecated since 2010. See [Testing for Client-side Web SQL Database](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.8-Testing_for_Client-side)
+**Cookies**
+key-value strings, persistence depends on attribute
+**Global Window Object**
+Developers can add custom attributes to the global window object, e.g., with `window.mystate = {isAdmin: yes}`
+Customizable, ephemeral until page is refreshed
 ### Web Servers
 Try to break the HTTP RFC, see whether this reveals info through error messages.
 #### Caching
@@ -140,6 +158,21 @@ Identify backend systems:
 `A`, `CNAME`, `MX`, `TXT`, and especially `NS` pointing to a target that can be registered by the attacker can lead to subdomain takeover
 When querying with `dig`, look for `NXDOMAIN`, `SERVFAIL`, `REFUSED`, and `no servers could be reached`. These indicate invalid configurations
 
+#### WebSockets
+`ws://` -> Unencrypted (HTTP). `wss:\\` -> Encrypted (HTTPS)
+The `Sec-WebSocket-Key` header is not used for authentication or session handling, just to prevent errors from caching proxies
+To identify: `ws:\\` or `wss:\\` in client-side code, network tab in browser dev tools, Burp Suite
+**Cross-Site WebSocket Hijacking (CSWSH)**
+If `Origin` header is honored and not CSRF tokens are used for the WS handshake, a CSRF-style attack is possible. Lure a victim onto attacker.com, which requests a WS handshake with the real application. The Browser will send the victims session cookies, authenticating it. But because the `Origin` header is attacker.com, our site cannot only send requests but, in contrast to CSRF, also receives the WS responses. Also, WS is not restrained by SOP.
+To test: Attempt to connect to the remove WS server using a [WS client](https://github.com/ethicalhack3r/scripts/blob/master/WebSockets.html). If a connection is established, they probably do not check the `Origin` header
+
+#### Web Messaging
+Also called Cross Document Messaging, introduced in HTML5. Allows for secure messaging between origins across iframes, tabs, and windows.
+To identify: Look for `postMessage(...` or `addEventListener("message", ...` in client-side code
+- Check that the handler of the event listener is filtering for `event.origin` and that neither it nor the second argument to `postMessage` uses wildcards
+- Check that the handler of the event listener is sanitizing the received data properly, to prevent XSS and other vulnerabilities caused through this
+
+
 ### Administration
 Options are:
 - Additional Webapp, as with iPlanet web server
@@ -174,7 +207,7 @@ And specific OWASP guides, depending on the used DMBS:
 - [Testing for MS Access](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.5-Testing_for_MS_Access)
 - [Testing for NoSQL Injection](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.6-Testing_for_NoSQL_Injection)
 - [Testing for ORM Injection](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.7-Testing_for_ORM_Injection)
-- [Testing for Client-side Web SQL Database](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.8-Testing_for_Client-side)
+- [[#Browser-based Storage|Testing for Client-side Web SQL Database]]
 ### CMS
 #### Wordpress
 ```bash
@@ -240,6 +273,21 @@ find / -name "configuration.php" -o -name "diagnostics.php" -o -name "joomla.inc
 ### Git
 Dump: `/GitTools/Dumper/gitdumper.sh http://192.168.1.33:8080/.git/ git`
 Extract: `/GitTools/Extractor/extractor.sh git retrieved`
+
+### APIs
+
+#### GraphQL
+**Introspection**
+Allows to request what queries are supported and with which data types
+```http
+POST /graphql? HTTP/1.1
+...
+
+{"query":"\n    query IntrospectionQuery {\r\n      __schema {\r\n        queryType { name }\r\n        mutationType { name }\r\n        subscriptionType { name }\r\n        types {\r\n          ...FullType\r\n        }\r\n        directives {\r\n          name\r\n          description\r\n          locations\r\n          args {\r\n            ...InputValue\r\n          }\r\n        }\r\n      }\r\n    }\r\n\r\n    fragment FullType on __Type {\r\n      kind\r\n      name\r\n      description\r\n      fields(includeDeprecated: true) {\r\n        name\r\n        description\r\n        args {\r\n          ...InputValue\r\n        }\r\n        type {\r\n          ...TypeRef\r\n        }\r\n        isDeprecated\r\n        deprecationReason\r\n      }\r\n      inputFields {\r\n        ...InputValue\r\n      }\r\n      interfaces {\r\n        ...TypeRef\r\n      }\r\n      enumValues(includeDeprecated: true) {\r\n        name\r\n        description\r\n        isDeprecated\r\n        deprecationReason\r\n      }\r\n      possibleTypes {\r\n        ...TypeRef\r\n      }\r\n    }\r\n\r\n    fragment InputValue on __InputValue {\r\n      name\r\n      description\r\n      type { ...TypeRef }\r\n      defaultValue\r\n    }\r\n\r\n    fragment TypeRef on __Type {\r\n      kind\r\n      name\r\n      ofType {\r\n        kind\r\n        name\r\n        ofType {\r\n          kind\r\n          name\r\n          ofType {\r\n            kind\r\n            name\r\n            ofType {\r\n              kind\r\n              name\r\n              ofType {\r\n                kind\r\n                name\r\n                ofType {\r\n                  kind\r\n                  name\r\n                  ofType {\r\n                    kind\r\n                    name\r\n                  }\r\n                }\r\n              }\r\n            }\r\n          }\r\n        }\r\n      }\r\n    }\r\n  ","variables":null}
+```
+[Source](https://the-bilal-rizwan.medium.com/graphql-common-vulnerabilities-how-to-exploit-them-464f9fdce696) 
+The result can be visualized with [GraphQL Voyager](https://apis.guru/graphql-voyager), although this does not display everything, e.g., it does not list available mutations
+If introspection is not available: Some implementations (e.g. Apollo Server and graphql-js) will return suggestions when misspelled field names are sent
 
 ## Web Logic
 ### Paths
@@ -571,7 +619,7 @@ Does authorization rely on regex? See [[8_grep_cheatsheet#Web#Regex|grep regex]]
 ### Generic Inputs
 In other sections: [[#SQL Injections]] [[#LDAP Injection]] 
 #### XSS
-- Identify variables that are reflected in responses or later used on the page.
+- Identify variables that are reflected in responses, later used on the page, or directly injected into the DOM tree.
 - Assess the input they accept and the encoding that gets applied on return (if any).
 
 **Bypasses**
@@ -580,6 +628,13 @@ In other sections: [[#SQL Injections]] [[#LDAP Injection]]
 - `?param=<script&param=>[...]</&param=script>` ([[#HTTP Parameter Pollution (HPP)]])
 [OWASP XSS Filter Evasion Cheat Sheet](https://owasp.org/www-community/xss-filter-evasion-cheatsheet)
 
+#### XSS Inclusion (XSSI)
+Similar to CSRF, but with the goal of reading sensitive data in the context of a victim instead of performing actions in it.
+Due to SOP, the response to cross-origin requests can't be read. Therefore, if we lure a victim to attacker.com and make a request to victim.com in their context, we cannot read the response from victim.com. However, if we embed a sensitive resource from victom.com into attacker.com, we might be able to leak its contents from the client-rendered version of attacker.com.
+
+To Identify: Vulnerable files include sensitive data only if requested by an authenticated user. To be exploitable, the files must be JS files or an attacker must be able to inject JS code into the file such that the file can be interpreted as JS and sensitive data is assigned to a global variable or returned by a function.
+
+Exploit: Embed the file with `<script src=...` on attacker.com and then leak its content with client-side source code after luring a victim on attacker.com. Leaking can be as easy as accessing the global variable, or it could mean overwriting browser functions like the array constructor or the forEach function.
 #### Mass Assignment
 With autobinding, user-provided data is automatically used for object creation in the backend, e.g., an object of class user. If that user has an isAdmin property and autobinding is used, we can this field during user creation to get admin.
 An indicator are input names with brackets, e.g., `<input name="user[name]"...`
@@ -676,10 +731,12 @@ Could be injected with `' or '1' = '1`
 Can also work blindly: [Blind XPath Injection](https://owasp.org/www-community/attacks/Blind_XPath_Injection)
 
 #### Template Injection
-See [KnowledgeBase - RCE](obsidian://open?vault=KnowledgeBase&file=03%20-%20Content%2F08%20-%20Courses%2F08%20-%20Remote%20Command%20Execution) and the [hackmanit cheatsheet](https://cheatsheet.hackmanit.de/template-injection-table/index.html)
-universal error-based polyglot: `<%'${{/#{@}}%>{{`
-If errors are not reflexted, use universal non-error-based polyglots: `p ">[[${{1}}]]`, `<%=1%>@*#{1}`, `{##}/*{{.}}*/`
-When you see a calculated result, find out where you are: `{{this}}`, `{{this%2B''}}`, `{{constrcutor%2B''}}`, `{{constrcutor.constructor%2B''}}`, `{{eval%2B''}}`
+To identify:
+- Universal error-based polyglot: `<%'${{/#{@}}%>{{`
+- If errors are not reflected, use universal non-error-based polyglots: `p ">[[${{1}}]]`, `<%=1%>@*#{1}`, `{##}/*{{.}}*/`
+See the [hackmanit cheatsheet](https://cheatsheet.hackmanit.de/template-injection-table/index.html) and [KnowledgeBase - RCE](obsidian://open?vault=KnowledgeBase&file=03%20-%20Content%2F08%20-%20Courses%2F08%20-%20Remote%20Command%20Execution) 
+When you found an client-side injection (CSTI), find out where you are: `{{this}}`, `{{this%2B''}}`, `{{constructor%2B''}}`, `{{constructor.constructor%2B''}}`, `{{eval%2B''}}`, check the CSP, find a sandbox bypass (many are known), and leverage to XSS
+When you found an server-side injection (SSTI), find ways to leverage to RCE depending on the language used by the framework
 #### SMTP/IMAP Injection
 Only of interest when the mail server is not directly accessible, e.g., from the internet.
 Terminate previous command with `%0d%0a`, for example, assume `message_id` is used in `FETCH XXX BODY[HEADER]`, an injection could look like this:
@@ -692,8 +749,6 @@ Insert string formatting control characters, e.g., `?username=%25s%25s%25s%25n`
 Very bad on C/C++ (printf, fprintf, sprintf, snprintf) and Perl (printf and sprintf) because they can write to memory with `%n`
 Okayish on Python (str.format), but can lead to memory read, see [here](https://lucumr.pocoo.org/2016/12/29/careful-with-str-format/)
 Can lead to runtime errors in Java (String.format and PrintStream.format) and PHP (printf)
-
-Continue with https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/README
 ## Results
 ### App Logic
 Note down interesting facts about different paths for later evaluation. Including:
